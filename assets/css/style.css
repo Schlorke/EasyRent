@@ -1,0 +1,356 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
+
+* {
+  font-family: "Inter", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("../img/carros.jpg") no-repeat center center/cover;
+  background-attachment: fixed; /* Fixa a imagem de fundo */
+  position: relative;
+}
+
+/* Adicionando filtro de opacidade e blur */
+body::before {
+  content: "";
+  position: fixed; /* Mantém o filtro fixo na tela */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(0, 123, 255, 0.85);
+  color: white;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+header .logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+  margin-right: 120px;
+}
+
+header nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+header nav ul li a:hover {
+  text-decoration: underline;
+}
+
+/* MAIN */
+main {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: auto;
+  padding: 5rem;
+}
+
+/* SEARCH BAR */
+.search-bar form {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Garantir espaçamento entre seções */
+.admin-grid,
+.search-bar,
+.vehicle-gallery {
+  position: relative;
+  margin-top: 2rem;
+  max-width: 1200px;
+}
+
+.search-bar input,
+.search-bar select,
+.search-bar button {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.search-bar button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-bar button:hover {
+  background: #0056b3;
+}
+
+/* FORMULÁRIOS (LOGIN & CADASTRO) */
+.form-container {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 2rem;
+  width: 400px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.form-container h2 {
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  color: #222;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #0056b3;
+  outline: none;
+}
+
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  color: white;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: linear-gradient(90deg, #0056b3, #003d82);
+}
+
+/* VEHICLE GALLERY */
+.vehicle-gallery {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+}
+
+.vehicle-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1.5rem;
+  height: 350px;
+  width: 280px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.vehicle-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.vehicle-card h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.vehicle-card p {
+  font-size: 0.95rem;
+  color: #666;
+  flex-grow: 1;
+  margin: auto;
+}
+
+.vehicle-card span {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #007bff;
+  margin-top: auto;
+  padding-bottom: 10px;
+}
+
+.vehicle-card .btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(90deg, #28a745, #218838);
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  text-transform: uppercase;
+}
+
+.vehicle-card .btn:hover {
+  background: linear-gradient(90deg, #218838, #1e7e34);
+  transform: scale(1.05);
+}
+
+/* PAINEL ADMIN */
+.admin-grid {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin: 1rem;
+  align-items: flex-start; /* Alinha todas as seções pelo topo */
+}
+
+.admin-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  flex: 1;
+  min-width: 300px;
+  max-width: 320px;
+  height: 590px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.admin-section h2 {
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+  gap: 0.8rem;
+}
+
+.admin-form input,
+.admin-form textarea {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.admin-form .btn {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: 0.3s;
+  margin-top: auto;
+}
+
+.admin-form .btn:hover {
+  background: linear-gradient(90deg, #138496, #11707f);
+  transform: scale(1.03);
+}
+
+.admin-vehicle-card {
+  height: 400px;
+}
+/* BOTÕES ADMIN - EDIÇÃO E EXCLUSÃO NOS CARDS */
+.vehicle-card .btn.editar {
+  background: linear-gradient(90deg, #007bff, #0056b3);
+  margin-bottom: 0.5rem;
+}
+
+.vehicle-card .btn.editar:hover {
+  background: linear-gradient(90deg, #0056b3, #003d82);
+  transform: scale(1.05);
+}
+
+.vehicle-card .btn.excluir {
+  background: linear-gradient(90deg, #dc3545, #c82333);
+}
+
+.vehicle-card .btn.excluir:hover {
+  background: linear-gradient(90deg, #c82333, #bd2130);
+  transform: scale(1.05);
+}
+
+/* FOOTER */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 123, 255, 0.85);
+  color: white;
+  font-weight: bold;
+  z-index: 1000;
+}

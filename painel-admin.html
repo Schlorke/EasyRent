@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo - EasyRent</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+  </head>
+  <body>
+    <header>
+      <div class="logo">EasyRent Admin</div>
+      <nav>
+        <ul>
+          <li><a href="painel-admin.html">Painel</a></li>
+          <li><a href="locacao.html">Veículos</a></li>
+          <li><a href="login.html">Sair</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Painel Administrativo -->
+      <div class="admin-grid">
+        <section class="admin-section">
+          <h2>Cadastro de Marcas</h2>
+          <form class="admin-form">
+            <input type="text" placeholder="Código" required />
+            <input type="text" placeholder="Descrição da Marca" required />
+            <button type="submit" class="btn salvar">Salvar</button>
+          </form>
+        </section>
+
+        <section class="admin-section">
+          <h2>Cadastro de Carros</h2>
+          <form class="admin-form">
+            <input type="text" placeholder="Código" required />
+            <input type="text" placeholder="Marca" required />
+            <input type="text" placeholder="Modelo" required />
+            <input type="text" placeholder="Ano" required />
+            <input type="text" placeholder="Cor" required />
+            <input type="text" placeholder="Descrição" required />
+            <textarea placeholder="Observações"></textarea>
+            <button type="submit" class="btn salvar">Salvar</button>
+          </form>
+        </section>
+
+        <section class="admin-section">
+          <h2>Cadastro de Usuários</h2>
+          <form class="admin-form">
+            <input type="text" placeholder="Código" required />
+            <input type="text" placeholder="Nome" required />
+            <input type="email" placeholder="E-mail" required />
+            <input type="password" placeholder="Senha" required />
+            <button type="submit" class="btn salvar">Salvar</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Locação abaixo do Painel Administrativo -->
+
+      <section class="search-bar">
+        <form>
+          <input type="text" placeholder="Buscar veículo" />
+          <select>
+            <option value="">Categoria</option>
+          </select>
+          <button type="submit">Pesquisar</button>
+        </form>
+      </section>
+
+      <section class="vehicle-gallery admin-vehicle">
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/civic.jpg" alt="Honda Civic" />
+          <h3>Honda Civic</h3>
+          <span>R$ 150/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/corolla.jpg" alt="Toyota Corolla" />
+          <h3>Toyota Corolla</h3>
+          <p>Design moderno e ótimo consumo de combustível.</p>
+          <span>R$ 160/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/golf.jpg" alt="Volkswagen Golf" />
+          <h3>Volkswagen Golf</h3>
+          <p>Compacto, ágil e potente para a cidade.</p>
+          <span>R$ 140/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/mustang.jpg" alt="Ford Mustang" />
+          <h3>Ford Mustang</h3>
+          <p>Potência e estilo em um só carro esportivo.</p>
+          <span>R$ 300/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/ranger.jpg" alt="Ford Ranger" />
+          <h3>Ford Ranger</h3>
+          <p>Robusta e pronta para qualquer aventura.</p>
+          <span>R$ 200/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/hrv.jpg" alt="Honda HR-V" />
+          <h3>Honda HR-V</h3>
+          <p>Um SUV versátil e espaçoso.</p>
+          <span>R$ 180/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/sw4.jpg" alt="Toyota SW4" />
+          <h3>Toyota SW4</h3>
+          <p>Luxo e resistência para qualquer terreno.</p>
+          <span>R$ 250/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+
+        <div class="vehicle-card admin-vehicle-card">
+          <img src="assets/img/jeep_compass.jpg" alt="Jeep Compass" />
+          <h3>Jeep Compass</h3>
+          <p>O SUV ideal para estrada e cidade.</p>
+          <span>R$ 190/dia</span>
+          <button type="button" class="btn editar">Editar</button>
+          <button type="button" class="btn excluir">Excluir</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 EasyRent Admin. Todos os direitos reservados.</p>
+    </footer>
+  </body>
+</html>
