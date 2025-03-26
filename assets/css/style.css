@@ -1,3 +1,6 @@
+/* =========================== */
+/*       IMPORTS E ROOT        */
+/* =========================== */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap");
 
 * {
@@ -8,10 +11,12 @@
   padding: 0;
 }
 
+/* =========================== */
+/*        ESTRUTURA BASE       */
+/* =========================== */
 html,
 body {
   height: 100%;
-  margin: 0;
   display: flex;
   flex-direction: column;
   background: url("../img/carros.jpg") no-repeat center center/cover;
@@ -19,18 +24,27 @@ body {
   position: relative;
 }
 
-/* Adicionando filtro de opacidade e blur */
+/* Opacidade e Blur de fundo com fallback */
 body::before {
   content: "";
-  position: fixed; /* Mantém o filtro fixo na tela */
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.7); /* Fallback com opacidade aumentada */
 }
 
+@supports (backdrop-filter: blur(5px)) {
+  body::before {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+  }
+}
+
+/* =========================== */
+/*            HEADER           */
+/* =========================== */
 header {
   position: fixed;
   top: 0;
@@ -54,7 +68,6 @@ header nav ul {
   list-style: none;
   display: flex;
   gap: 1rem;
-  margin-right: 120px;
 }
 
 header nav ul li a {
@@ -68,61 +81,51 @@ header nav ul li a:hover {
   text-decoration: underline;
 }
 
-/* MAIN */
+/* =========================== */
+/*            MAIN             */
+/* =========================== */
 main {
   position: relative;
+  top: 25px;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 2rem;
+  width: 100%;
+}
+
+/* =========================== */
+/*      FORMULÁRIOS (LOGIN & CADASTRO)      */
+/* =========================== */
+/* Página de login/cadastro ocupa 100vh com centralização e footer fixo ao final */
+.page-container {
   display: flex;
   flex-direction: column;
   flex: 1;
-  align-items: center;
-  margin-top: auto;
-  padding: 5rem;
 }
 
-/* SEARCH BAR */
-.search-bar form {
-  position: relative;
+.page-container.auth {
+  height: 100vh;
+}
+
+.auth-container {
+  flex: 1;
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 1rem 2rem;
-  border-radius: 12px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
 }
 
-/* Garantir espaçamento entre seções */
-.admin-grid,
-.search-bar,
-.vehicle-gallery {
-  position: relative;
-  margin-top: 2rem;
-  max-width: 1200px;
+.page-container main {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
 }
 
-.search-bar input,
-.search-bar select,
-.search-bar button {
-  padding: 0.8rem 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-.search-bar button {
-  background: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.search-bar button:hover {
-  background: #0056b3;
-}
-
-/* FORMULÁRIOS (LOGIN & CADASTRO) */
 .form-container {
   position: relative;
   background: rgba(255, 255, 255, 0.95);
@@ -165,6 +168,9 @@ main {
   outline: none;
 }
 
+/* =========================== */
+/*           BOTÕES            */
+/* =========================== */
 .btn {
   width: 100%;
   padding: 12px;
@@ -181,7 +187,45 @@ main {
   background: linear-gradient(90deg, #0056b3, #003d82);
 }
 
-/* VEHICLE GALLERY */
+/* =========================== */
+/*         SEARCH BAR          */
+/* =========================== */
+.search-bar form {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.search-bar input,
+.search-bar select,
+.search-bar button {
+  padding: 0.8rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.search-bar button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.search-bar button:hover {
+  background: #0056b3;
+}
+
+/* =========================== */
+/*       VEHICLE GALLERY       */
+/* =========================== */
 .vehicle-gallery {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -252,7 +296,9 @@ main {
   transform: scale(1.05);
 }
 
-/* PAINEL ADMIN */
+/* =========================== */
+/*         PAINEL ADMIN        */
+/* =========================== */
 .admin-grid {
   position: relative;
   display: flex;
@@ -267,7 +313,6 @@ main {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
   flex: 1;
   min-width: 300px;
   max-width: 320px;
@@ -321,7 +366,8 @@ main {
 .admin-vehicle-card {
   height: 400px;
 }
-/* BOTÕES ADMIN - EDIÇÃO E EXCLUSÃO NOS CARDS */
+
+/* Botões para Edição e Exclusão nos Cards Admin */
 .vehicle-card .btn.editar {
   background: linear-gradient(90deg, #007bff, #0056b3);
   margin-bottom: 0.5rem;
@@ -341,7 +387,10 @@ main {
   transform: scale(1.05);
 }
 
-/* FOOTER */
+/* =========================== */
+/*           FOOTER            */
+/* =========================== */
+/* Footer fixo no fim apenas se o conteúdo não preencher a tela */
 footer {
   position: relative;
   width: 100%;
@@ -350,4 +399,41 @@ footer {
   background: rgba(0, 123, 255, 0.85);
   color: white;
   font-weight: bold;
+}
+
+/* =========================== */
+/*       RESPONSIVIDADE        */
+/* =========================== */
+@media (max-width: 768px) {
+  header nav ul {
+    margin-right: 0;
+    gap: 0.5rem;
+  }
+
+  .form-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .input-group input {
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header .logo {
+    font-size: 1.2rem;
+  }
+
+  .form-container {
+    width: 90%;
+  }
+
+  header nav ul li a {
+    font-size: 16px;
+  }
 }
