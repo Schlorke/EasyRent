@@ -86,7 +86,7 @@ header nav ul li a:hover {
 /* =========================== */
 main {
   position: relative;
-  top: 25px;
+  top: 30px;
   flex: 1;
   display: flex;
   justify-content: center;
@@ -190,6 +190,10 @@ main {
 /* =========================== */
 /*         SEARCH BAR          */
 /* =========================== */
+.search-bar {
+  padding: 1rem;
+}
+
 .search-bar form {
   position: relative;
   display: flex;
