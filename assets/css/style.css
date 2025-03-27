@@ -22,8 +22,7 @@ body {
   display: flex;
   flex-direction: column;
   background: url("../img/carros.jpg") no-repeat center center/cover;
-  background-attachment: fix;
-  background-color: rgba(0, 123, 255, 0.85);
+  background-attachment: scroll !important;
   position: relative;
   overflow-x: hidden; /* Impede barra de rolagem horizontal */
 }
@@ -38,15 +37,6 @@ body {
   }
 }
 /* Opacidade e Blur de fundo com fallback */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7); /* Fallback com opacidade aumentada */
-}
 
 @supports (backdrop-filter: blur(5px)) {
   body::before {
@@ -60,20 +50,37 @@ body::before {
 /* =========================== */
 header {
   position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  background: transparent;
+  height: 60px; /* Altura do header */
+  background: rgba(0, 123, 255, 0.85);
   color: white;
-  padding: 1rem 4rem;
+  padding: 0 4rem;
   display: flex;
   justify-content: space-between; /* Logo à esquerda, hamburger/menu à direita */
   align-items: center;
   z-index: 1000;
 }
 
+/* Ajuste do safe area no header, se quiser cobrir a área do notch */
 @supports (padding: max(0px)) {
   header {
-    top: env(safe-area-inset-top); /* Faz o header começar após o notch */
+    top: env(safe-area-inset-top);
   }
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 60px; /* overlay só começa depois do header */
+  left: 0;
+  width: 100%;
+  top: calc(60px + env(safe-area-inset-top));
+  height: calc(100% - 60px - env(safe-area-inset-top));
+  background: rgba(0, 0, 0, 0.5); /* seu overlay escuro */
+  backdrop-filter: blur(5px); /* se desejar o blur */
+  pointer-events: none;
 }
 
 header .logo {
