@@ -23,6 +23,7 @@ body {
   flex-direction: column;
   background: url("../img/carros.jpg") no-repeat center center/cover;
   background-attachment: fix;
+  background-color: rgba(0, 123, 255, 0.85);
   position: relative;
   overflow-x: hidden; /* Impede barra de rolagem horizontal */
 }
