@@ -22,7 +22,7 @@ body {
   display: flex;
   flex-direction: column;
   background: url("../img/carros.jpg") no-repeat center center/cover;
-  background-attachment: fixed;
+  background-attachment: scroll !important;
   position: relative;
   overflow-x: hidden; /* Impede barra de rolagem horizontal */
 }
@@ -36,12 +36,6 @@ body {
        padding-right: env(safe-area-inset-right); */
   }
 }
-@supports (padding: max(0px)) {
-  header {
-    top: env(safe-area-inset-top);
-  }
-}
-
 /* Opacidade e Blur de fundo com fallback */
 body::before {
   content: "";
@@ -65,16 +59,20 @@ body::before {
 /* =========================== */
 header {
   position: fixed;
-  top: 0;
-  left: 0;
   width: 100%;
   background: rgba(0, 123, 255, 0.85);
   color: white;
-  padding: 1rem 2rem;
+  padding: 1rem 4rem;
   display: flex;
   justify-content: space-between; /* Logo à esquerda, hamburger/menu à direita */
   align-items: center;
   z-index: 1000;
+}
+
+@supports (padding: max(0px)) {
+  header {
+    top: env(safe-area-inset-top); /* Faz o header começar após o notch */
+  }
 }
 
 header .logo {
@@ -202,10 +200,10 @@ header nav ul li a:hover {
 /*            MAIN             */
 /* =========================== */
 main {
+  margin-top: 60px; /* Se seu header tiver ~60px de altura */
   position: relative;
-  top: 30px;
-  flex: 1;
   display: flex;
+  flex: 1;
   justify-content: center;
   align-items: center;
   flex-direction: column;
