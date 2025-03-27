@@ -16,12 +16,15 @@
 /* =========================== */
 html,
 body {
+  margin: 0;
+  padding: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
   background: url("../img/carros.jpg") no-repeat center center/cover;
   background-attachment: fixed;
   position: relative;
+  overflow-x: hidden; /* Impede barra de rolagem horizontal */
 }
 
 /* Opacidade e Blur de fundo com fallback */
@@ -54,7 +57,7 @@ header {
   color: white;
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* Logo à esquerda, hamburger/menu à direita */
   align-items: center;
   z-index: 1000;
 }
@@ -71,6 +74,7 @@ header nav ul {
 }
 
 header nav ul li a {
+  position: relative;
   color: white;
   text-decoration: none;
   font-weight: bold;
@@ -79,6 +83,104 @@ header nav ul li a {
 
 header nav ul li a:hover {
   text-decoration: underline;
+}
+/* =========================== */
+/*       HAMBURGER MENU        */
+/* =========================== */
+
+/* Esconde o hamburger no desktop, mostra no mobile */
+.hamburger {
+  display: none;
+}
+
+.nav-menu ul li a span {
+  display: none;
+}
+/* No mobile, some com o menu fixo e mostra só o hamburger */
+@media (max-width: 766px) {
+  header nav ul {
+    display: none;
+  }
+
+  /* Botão hamburger: contêiner de 32x32px */
+  .hamburger {
+    display: flex;
+    width: 30px;
+    height: 20px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: auto;
+    z-index: 1001;
+    cursor: pointer;
+  }
+  /* Barrinhas */
+  .hamburger span {
+    width: 100%; /* Largura da barra */
+    height: 4px; /* Espessura da barra */
+    background: #fff;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center; /* Gira a partir do centro */
+  }
+
+  /* Animação: "X" perfeito */
+  .hamburger.active span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+  /* Define o menu que será aberto com o hamburger */
+  .nav-menu {
+    top: 0;
+    right: 0;
+    display: block; /* Agora sim aparece como bloco */
+    position: fixed;
+    justify-items: center;
+    width: 200px;
+    height: 100vh;
+    background: rgba(0, 123, 255);
+    padding: 1rem;
+    transform: translateX(100%); /* Inicia fora da tela à direita */
+    transition: transform 0.3s ease-in-out;
+  }
+
+  /* Quando .nav-menu estiver ativo, desliza para dentro */
+  .nav-menu.active {
+    transform: translateX(0);
+  }
+
+  /* Estiliza a lista dentro do menu mobile */
+  .nav-menu ul {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    list-style: none;
+    margin-top: 3.3rem; /* Ajuste se precisar de espaço */
+    justify-content: space-between;
+  }
+
+  .nav-menu ul li a {
+    font-size: 1.4rem;
+    color: #fff;
+    display: inline-flex;
+    align-items: center; /* Garante alinhamento vertical */
+    gap: 0.5rem; /* Espaço entre ícone e texto */
+    text-decoration: none;
+    font-weight: bold;
+    line-height: 1; /* Impede espaço extra vertical */
+  }
+
+  .nav-menu ul li a .material-icons {
+    font-size: 1.4rem;
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+  }
 }
 
 /* =========================== */
@@ -107,9 +209,8 @@ main {
 }
 
 .page-container.auth {
-  height: 100vh;
+  flex: 1; /* Assim o container se expande sem forçar a altura */
 }
-
 .auth-container {
   flex: 1;
   display: flex;
@@ -403,41 +504,213 @@ footer {
   background: rgba(0, 123, 255, 0.85);
   color: white;
   font-weight: bold;
+  margin-top: auto; /* Se estiver usando flex no body, empurra footer para o fim */
 }
 
 /* =========================== */
-/*       RESPONSIVIDADE        */
+/*  BREAKPOINTS - RESPONSIVO   */
 /* =========================== */
+
+/* 
+   1) Dispositivos grandes até 1440px de largura 
+   (similar ao @media (max-width: 1440px) no seu código de referência)
+*/
+@media (max-width: 1440px) {
+  /* Exemplo: Ajusta a galeria de veículos para 3 colunas */
+  .vehicle-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Exemplo: Ajuste no form container para telas até 1440px */
+  .form-container {
+    max-width: 450px; /* ou ajuste conforme necessário */
+  }
+
+  /* Ajuste de layout do admin-grid */
+  .admin-grid {
+    gap: 1.5rem; /* Diminui espaçamento se desejar */
+  }
+}
+
+/* 
+   2) Dispositivos médios até 1199px de largura 
+   (similar ao @media (max-width: 1199px) no código de referência)
+*/
+@media (max-width: 1199px) {
+  /* Vehicle gallery com 2 colunas */
+  .vehicle-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Admin-grid com layout em colunas empilhadas (ou 2 colunas) */
+  .admin-grid {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Search bar pode manter layout em coluna ou row, dependendo da sua preferência */
+  .search-bar form {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* 
+   3) Dispositivos menores até 766px de largura 
+   (similar ao @media (max-width: 766px) no código de referência)
+*/
 @media (max-width: 768px) {
+  body {
+    background-attachment: scroll; /* Evita bugs em mobile */
+  }
+  /* Vehicle gallery em 1 coluna */
+  .vehicle-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  /* Admin-grid empilha tudo em uma coluna */
+  .admin-grid {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Form container ocupa quase toda a tela */
+  .form-container {
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  /* Header com possíveis ajustes no menu */
   header nav ul {
-    margin-right: 0;
     gap: 0.5rem;
   }
+}
 
-  .form-container {
-    padding: 1.5rem;
-    margin: 1rem;
+/* 
+   4) Dispositivos até 539px de largura 
+   (similar ao @media (max-width: 539px) no código de referência)
+*/
+@media (max-width: 539px) {
+  /* Vehicle gallery em full width */
+  .vehicle-gallery {
+    grid-template-columns: 1fr;
   }
 
-  .input-group input {
-    font-size: 0.95rem;
+  /* Ajuste de fontes e espaçamentos gerais */
+  header .logo {
+    font-size: 1.1rem;
+  }
+  header nav ul li a {
+    font-size: 0.9rem;
+  }
+  .btn {
+    font-size: 0.9rem;
+    padding: 10px;
+  }
+}
+
+/* 
+   5) Dispositivos muito estreitos (até 320px, se precisar)
+   (similar ao @media screen and (max-width: 320px))
+*/
+@media (max-width: 320px) {
+  /* Ajuste de padding e fontes para caber na tela */
+  .search-bar form {
+    padding: 0.5rem;
+  }
+  .admin-section {
+    min-width: auto;
+    width: 90%;
+  }
+}
+
+/* 
+   6) Ajustes a partir de 327px (como no código de referência)
+   (pode ser útil para um layout um pouco maior que 320px)
+*/
+@media (min-width: 327px) {
+  /* Exemplo: reposicionar elementos ou ajustar margens */
+  .page-container.auth {
+    padding: 1rem;
+  }
+}
+
+/* 
+   7) Ajustes a partir de 540px (como no código de referência)
+   (tablets pequenos)
+*/
+@media (min-width: 540px) {
+  /* Vehicle gallery com 2 colunas, por exemplo */
+  .vehicle-gallery {
+    grid-template-columns: repeat(2, 1fr);
   }
 
+  .admin-grid {
+    flex-direction: row;
+  }
+
+  /* Ajuste de fontes ou tamanhos de botões */
   .btn {
     font-size: 1rem;
   }
 }
 
-@media (max-width: 480px) {
-  header .logo {
-    font-size: 1.2rem;
+/* 
+   8) Ajustes a partir de 768px (tablets maiores/notebooks pequenos)
+*/
+@media (min-width: 768px) {
+  /* Vehicle gallery pode ter 3 colunas */
+  .vehicle-gallery {
+    grid-template-columns: repeat(3, 1fr);
   }
 
+  /* Admin-grid em 2 ou 3 colunas */
+  .admin-grid {
+    gap: 2rem;
+  }
+
+  /* Aumenta a form-container se quiser */
   .form-container {
-    width: 90%;
+    max-width: 500px;
+  }
+}
+
+/* 
+   9) Ajustes a partir de 1200px (desktops médios)
+*/
+@media (min-width: 1200px) {
+  .vehicle-gallery {
+    grid-template-columns: repeat(3, 1fr);
   }
 
-  header nav ul li a {
-    font-size: 16px;
+  /* Admin-grid com layout mais espaçoso */
+  .admin-grid {
+    gap: 2rem;
+  }
+
+  /* Fontes e espaçamentos maiores */
+  header .logo {
+    font-size: 1.5rem;
+  }
+  .btn {
+    font-size: 1.1rem;
+  }
+}
+
+/* 
+  10) Ajustes a partir de 1500px (desktops grandes)
+*/
+@media (min-width: 1500px) {
+  .vehicle-gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .admin-grid {
+    gap: 2.5rem;
+  }
+
+  .btn {
+    font-size: 1.2rem;
   }
 }
