@@ -26,7 +26,16 @@ body {
   position: relative;
   overflow-x: hidden; /* Impede barra de rolagem horizontal */
 }
-
+/* Safe Area para iOS */
+@supports (padding: max(0px)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    /* Se quiser também cobrir laterais:
+       padding-left: env(safe-area-inset-left);
+       padding-right: env(safe-area-inset-right); */
+  }
+}
 /* Opacidade e Blur de fundo com fallback */
 body::before {
   content: "";
@@ -561,7 +570,7 @@ footer {
 */
 @media (max-width: 768px) {
   body {
-    background-attachment: scroll; /* Evita bugs em mobile */
+    background-attachment: scroll !important; /* Evita bugs em mobile */
   }
   /* Vehicle gallery em 1 coluna */
   .vehicle-gallery {
