@@ -5,17 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel Administrativo - EasyRent</title>
     <link rel="stylesheet" href="assets/css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <header>
-      <div class="logo">EasyRent Admin</div>
-      <nav>
+      <div class="logo">EasyRent</div>
+      <!-- Menu que será aberto/fechado pelo hamburger -->
+      <nav class="nav-menu" id="nav-menu">
         <ul>
-          <li><a href="painel-admin.html">Painel</a></li>
-          <li><a href="index.html">Veículos</a></li>
-          <li><a href="login.html">Sair</a></li>
+          <li>
+            <a href="index.html"
+              ><span class="material-icons">home</span>Início</a
+            >
+          </li>
+          <li>
+            <a href="index.html"
+              ><span class="material-icons">directions_car</span>Veículos</a
+            >
+          </li>
+          <li>
+            <a href="login.html"
+              ><span class="material-icons">person</span>Login</a
+            >
+          </li>
         </ul>
       </nav>
+      <!-- Botão Hamburger -->
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
     </header>
 
     <main>
@@ -145,5 +168,6 @@
     <footer>
       <p>&copy; 2025 EasyRent Admin. Todos os direitos reservados.</p>
     </footer>
+    <script src="assets/js/script.js"></script>
   </body>
 </html>
