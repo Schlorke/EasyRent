@@ -15,34 +15,46 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm border-b">
+    <header className="bg-white shadow-lg border-b-2 border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-2">
-              <Car className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">EasyRent</span>
+            <Link to="/" className="flex items-center space-x-3 group">
+              <div className="bg-blue-600 rounded-lg p-2 group-hover:bg-blue-700 transition-colors">
+                <Car className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                EasyRent
+              </span>
             </Link>
           </div>
 
-          <nav className="flex items-center space-x-4">
-            <Link to="/" className="text-gray-700 hover:text-blue-600">
+          <nav className="flex items-center space-x-6">
+            <Link 
+              to="/" 
+              className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-blue-50 transition-all duration-200"
+            >
               Início
             </Link>
-            <Link to="/locacao" className="text-gray-700 hover:text-blue-600">
+            <Link 
+              to="/locacao" 
+              className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-blue-50 transition-all duration-200"
+            >
               Veículos
             </Link>
             
             {isAuthenticated ? (
               <>
                 {isAdmin && (
-                  <Link to="/admin" className="text-gray-700 hover:text-blue-600">
+                  <Link 
+                    to="/admin" 
+                    className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-blue-50 transition-all duration-200"
+                  >
                     Admin
                   </Link>
                 )}
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={handleLogout}
                   className="flex items-center space-x-2"
                 >
@@ -51,10 +63,9 @@ const Header: React.FC = () => {
                 </Button>
               </>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => navigate('/login')}
                   className="flex items-center space-x-2"
                 >
@@ -62,10 +73,10 @@ const Header: React.FC = () => {
                   <span>Login</span>
                 </Button>
                 <Button
-                  size="sm"
                   onClick={() => navigate('/cadastro')}
+                  className="flex items-center space-x-2"
                 >
-                  Cadastro
+                  <span>Cadastro</span>
                 </Button>
               </div>
             )}

@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Banco de dados local para teste
+  postgres:
+    image: postgres:14
+    environment:
+      - POSTGRES_DB=easyrent_local
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_local_data:/var/lib/postgresql/data
+    networks:
+      - easyrent-local
+
+  # Backend com banco local
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - DATABASE_URL=postgresql://postgres:postgres123@postgres:5432/easyrent_local
+      - JWT_SECRET=82acf9dc36bddaeff81fb33d78f728bb04843a0c3f0fbfc4ad8b671d2528bbc080e03a3323d13b67065a90c513381cac56bb3da110a5d566df3cca05d73cfabd
+      - FRONTEND_URL=http://localhost:5173
+    depends_on:
+      - postgres
+    networks:
+      - easyrent-local
+    restart: unless-stopped
+
+  # Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    depends_on:
+      - backend
+    networks:
+      - easyrent-local
+    restart: unless-stopped
+
+networks:
+  easyrent-local:
+    driver: bridge
+
+volumes:
+  postgres_local_data:

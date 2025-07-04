@@ -48,38 +48,41 @@ const Home: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="text-center">
+            <Card variant="modern" className="text-center p-8 hover:scale-105">
               <CardHeader>
-                <div className="mx-auto bg-blue-100 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
-                  <Car className="h-8 w-8 text-blue-600" />
+                <div className="mx-auto bg-gradient-to-br from-blue-100 to-blue-200 rounded-full p-4 w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
+                  <Car className="h-10 w-10 text-blue-600" />
                 </div>
-                <CardTitle>Frota Moderna</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl mb-3 text-gray-900">Frota Moderna</CardTitle>
+                <CardDescription className="text-base text-gray-600">
                   Veículos novos e bem conservados de diversas marcas e modelos
+                  para atender todas as suas necessidades
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card variant="modern" className="text-center p-8 hover:scale-105">
               <CardHeader>
-                <div className="mx-auto bg-green-100 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
-                  <Shield className="h-8 w-8 text-green-600" />
+                <div className="mx-auto bg-gradient-to-br from-green-100 to-green-200 rounded-full p-4 w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
+                  <Shield className="h-10 w-10 text-green-600" />
                 </div>
-                <CardTitle>Segurança</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl mb-3 text-gray-900">Segurança Total</CardTitle>
+                <CardDescription className="text-base text-gray-600">
                   Todos os veículos com seguro completo e assistência 24h
+                  para sua total tranquilidade
                 </CardDescription>
               </CardHeader>
             </Card>
 
-            <Card className="text-center">
+            <Card variant="modern" className="text-center p-8 hover:scale-105">
               <CardHeader>
-                <div className="mx-auto bg-purple-100 rounded-full p-3 w-16 h-16 flex items-center justify-center mb-4">
-                  <Clock className="h-8 w-8 text-purple-600" />
+                <div className="mx-auto bg-gradient-to-br from-purple-100 to-purple-200 rounded-full p-4 w-20 h-20 flex items-center justify-center mb-6 shadow-lg">
+                  <Clock className="h-10 w-10 text-purple-600" />
                 </div>
-                <CardTitle>Disponibilidade</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-2xl mb-3 text-gray-900">Disponibilidade 24h</CardTitle>
+                <CardDescription className="text-base text-gray-600">
                   Locação rápida e fácil, disponível 24 horas por dia
+                  para sua máxima conveniência
                 </CardDescription>
               </CardHeader>
             </Card>

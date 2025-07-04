@@ -29,6 +29,66 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// Buscar carros disponíveis para locação
+router.get('/disponiveis', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { dataInicio, dataFim } = req.query;
+
+    if (!dataInicio || !dataFim) {
+      res.status(400).json({ 
+        message: 'Data de início e fim são obrigatórias' 
+      });
+      return;
+    }
+
+    // Buscar carros que não têm locações conflitantes
+    const carros = await prisma.carro.findMany({
+      where: {
+        locacoes: {
+          none: {
+            OR: [
+              {
+                AND: [
+                  { dataRetirada: { lte: new Date(dataInicio as string) } },
+                  { dataDevolucao: { gte: new Date(dataInicio as string) } }
+                ]
+              },
+              {
+                AND: [
+                  { dataRetirada: { lte: new Date(dataFim as string) } },
+                  { dataDevolucao: { gte: new Date(dataFim as string) } }
+                ]
+              },
+              {
+                AND: [
+                  { dataRetirada: { gte: new Date(dataInicio as string) } },
+                  { dataDevolucao: { lte: new Date(dataFim as string) } }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      include: {
+        modelo: {
+          include: {
+            marca: true
+          }
+        }
+      },
+      orderBy: [
+        { modelo: { marca: { nome: 'asc' } } },
+        { modelo: { descricao: 'asc' } }
+      ]
+    });
+
+    res.json(carros);
+  } catch (error) {
+    console.error('Erro ao buscar carros disponíveis:', error);
+    res.status(500).json({ message: 'Erro interno do servidor' });
+  }
+});
+
 // Obter carro por ID
 router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -250,66 +310,6 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response): Pr
     res.status(204).send();
   } catch (error) {
     console.error('Erro ao deletar carro:', error);
-    res.status(500).json({ message: 'Erro interno do servidor' });
-  }
-});
-
-// Buscar carros disponíveis para locação
-router.get('/disponivel/buscar', async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { dataInicio, dataFim } = req.query;
-
-    if (!dataInicio || !dataFim) {
-      res.status(400).json({ 
-        message: 'Data de início e fim são obrigatórias' 
-      });
-      return;
-    }
-
-    // Buscar carros que não têm locações conflitantes
-    const carros = await prisma.carro.findMany({
-      where: {
-        locacoes: {
-          none: {
-            OR: [
-              {
-                AND: [
-                  { dataRetirada: { lte: new Date(dataInicio as string) } },
-                  { dataDevolucao: { gte: new Date(dataInicio as string) } }
-                ]
-              },
-              {
-                AND: [
-                  { dataRetirada: { lte: new Date(dataFim as string) } },
-                  { dataDevolucao: { gte: new Date(dataFim as string) } }
-                ]
-              },
-              {
-                AND: [
-                  { dataRetirada: { gte: new Date(dataInicio as string) } },
-                  { dataDevolucao: { lte: new Date(dataFim as string) } }
-                ]
-              }
-            ]
-          }
-        }
-      },
-      include: {
-        modelo: {
-          include: {
-            marca: true
-          }
-        }
-      },
-      orderBy: [
-        { modelo: { marca: { nome: 'asc' } } },
-        { modelo: { descricao: 'asc' } }
-      ]
-    });
-
-    res.json(carros);
-  } catch (error) {
-    console.error('Erro ao buscar carros disponíveis:', error);
     res.status(500).json({ message: 'Erro interno do servidor' });
   }
 });

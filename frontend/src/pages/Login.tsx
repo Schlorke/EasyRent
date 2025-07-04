@@ -31,70 +31,72 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <Car className="h-12 w-12 text-blue-600" />
+            <div className="bg-blue-600 rounded-full p-4 shadow-lg">
+              <Car className="h-12 w-12 text-white" />
+            </div>
           </div>
-          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Faça login na sua conta
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-3 text-base text-gray-600">
             Ou{' '}
-            <Link to="/cadastro" className="font-medium text-blue-600 hover:text-blue-500">
+            <Link to="/cadastro" className="font-semibold text-blue-600 hover:text-blue-500 underline">
               crie uma nova conta
             </Link>
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>
-              Entre com suas credenciais para acessar o sistema
+        <Card variant="elevated" className="p-8">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl">Bem-vindo de volta!</CardTitle>
+            <CardDescription className="text-base">
+              Entre com suas credenciais para acessar o EasyRent
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="flex items-center space-x-2 text-red-600 bg-red-50 p-3 rounded-md">
-                  <AlertCircle className="h-5 w-5" />
-                  <span className="text-sm">{error}</span>
+                <div className="flex items-center space-x-3 text-red-700 bg-red-50 p-4 rounded-lg border border-red-200">
+                  <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">{error}</span>
                 </div>
               )}
 
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <div className="space-y-3">
+                <label htmlFor="email" className="text-sm font-semibold text-gray-800">
                   E-mail
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="Digite seu e-mail"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
+                    className="pl-11 h-12 border-2 border-gray-300 focus:border-blue-500 rounded-lg"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label htmlFor="senha" className="text-sm font-medium text-gray-700">
+              <div className="space-y-3">
+                <label htmlFor="senha" className="text-sm font-semibold text-gray-800">
                   Senha
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                   <Input
                     id="senha"
                     type="password"
                     placeholder="Digite sua senha"
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
-                    className="pl-10"
+                    className="pl-11 h-12 border-2 border-gray-300 focus:border-blue-500 rounded-lg"
                     required
                   />
                 </div>
@@ -102,6 +104,7 @@ const Login: React.FC = () => {
 
               <Button
                 type="submit"
+                size="lg"
                 className="w-full"
                 disabled={loading}
               >
