@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import prisma from '../services/prisma';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
 // Listar todos os carros
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const carros = await prisma.carro.findMany({
       include: {
@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 });
 
 // Obter carro por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -57,7 +57,8 @@ router.get('/:id', async (req, res) => {
     });
 
     if (!carro) {
-      return res.status(404).json({ message: 'Carro não encontrado' });
+      res.status(404).json({ message: 'Carro não encontrado' });
+      return;
     }
 
     res.json(carro);
@@ -68,22 +69,24 @@ router.get('/:id', async (req, res) => {
 });
 
 // Criar novo carro
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
 
     if (!codigo || !modeloId || !ano || !cor || !descricao) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Código, modelo, ano, cor e descrição são obrigatórios' 
       });
+      return;
     }
 
     // Validar ano
     const anoAtual = new Date().getFullYear();
     if (ano < 1900 || ano > anoAtual + 1) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Ano deve estar entre 1900 e ' + (anoAtual + 1) 
       });
+      return;
     }
 
     // Verificar se o modelo existe
@@ -93,7 +96,8 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     if (!modelo) {
-      return res.status(404).json({ message: 'Modelo não encontrado' });
+      res.status(404).json({ message: 'Modelo não encontrado' });
+      return;
     }
 
     // Verificar se o código já existe
@@ -102,7 +106,8 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     if (carroExistente) {
-      return res.status(409).json({ message: 'Código do carro já cadastrado' });
+      res.status(409).json({ message: 'Código do carro já cadastrado' });
+      return;
     }
 
     const carro = await prisma.carro.create({
@@ -131,23 +136,25 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Atualizar carro
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
 
     if (!codigo || !modeloId || !ano || !cor || !descricao) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Código, modelo, ano, cor e descrição são obrigatórios' 
       });
+      return;
     }
 
     // Validar ano
     const anoAtual = new Date().getFullYear();
     if (ano < 1900 || ano > anoAtual + 1) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Ano deve estar entre 1900 e ' + (anoAtual + 1) 
       });
+      return;
     }
 
     // Verificar se o carro existe
@@ -156,7 +163,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!carroExistente) {
-      return res.status(404).json({ message: 'Carro não encontrado' });
+      res.status(404).json({ message: 'Carro não encontrado' });
+      return;
     }
 
     // Verificar se o modelo existe
@@ -166,7 +174,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!modelo) {
-      return res.status(404).json({ message: 'Modelo não encontrado' });
+      res.status(404).json({ message: 'Modelo não encontrado' });
+      return;
     }
 
     // Verificar se o código já está em uso por outro carro
@@ -178,7 +187,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (carroComMesmoCodigo) {
-      return res.status(409).json({ message: 'Código do carro já está em uso' });
+      res.status(409).json({ message: 'Código do carro já está em uso' });
+      return;
     }
 
     const carro = await prisma.carro.update({
@@ -208,7 +218,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // Deletar carro
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -221,14 +231,16 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!carro) {
-      return res.status(404).json({ message: 'Carro não encontrado' });
+      res.status(404).json({ message: 'Carro não encontrado' });
+      return;
     }
 
     // Verificar se existem locações associadas
     if (carro.locacoes.length > 0) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Não é possível excluir o carro pois existem locações associadas' 
       });
+      return;
     }
 
     await prisma.carro.delete({
@@ -243,14 +255,15 @@ router.delete('/:id', authenticateToken, async (req, res) => {
 });
 
 // Buscar carros disponíveis para locação
-router.get('/disponivel/buscar', async (req, res) => {
+router.get('/disponivel/buscar', async (req: Request, res: Response): Promise<void> => {
   try {
     const { dataInicio, dataFim } = req.query;
 
     if (!dataInicio || !dataFim) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Data de início e fim são obrigatórias' 
       });
+      return;
     }
 
     // Buscar carros que não têm locações conflitantes

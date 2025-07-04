@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import prisma from '../services/prisma';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
 // Listar todas as marcas
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const marcas = await prisma.marca.findMany({
       include: {
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
 });
 
 // Obter marca por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -44,7 +44,8 @@ router.get('/:id', async (req, res) => {
     });
 
     if (!marca) {
-      return res.status(404).json({ message: 'Marca não encontrada' });
+      res.status(404).json({ message: 'Marca não encontrada' });
+      return;
     }
 
     res.json(marca);
@@ -55,12 +56,13 @@ router.get('/:id', async (req, res) => {
 });
 
 // Criar nova marca
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { nome } = req.body;
 
     if (!nome) {
-      return res.status(400).json({ message: 'Nome da marca é obrigatório' });
+      res.status(400).json({ message: 'Nome da marca é obrigatório' });
+      return;
     }
 
     // Verificar se a marca já existe
@@ -69,7 +71,8 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     if (marcaExistente) {
-      return res.status(409).json({ message: 'Marca já cadastrada' });
+      res.status(409).json({ message: 'Marca já cadastrada' });
+      return;
     }
 
     const marca = await prisma.marca.create({
@@ -84,13 +87,14 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Atualizar marca
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { nome } = req.body;
 
     if (!nome) {
-      return res.status(400).json({ message: 'Nome da marca é obrigatório' });
+      res.status(400).json({ message: 'Nome da marca é obrigatório' });
+      return;
     }
 
     // Verificar se a marca existe
@@ -99,7 +103,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!marcaExistente) {
-      return res.status(404).json({ message: 'Marca não encontrada' });
+      res.status(404).json({ message: 'Marca não encontrada' });
+      return;
     }
 
     // Verificar se o novo nome já está em uso por outra marca
@@ -111,7 +116,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (marcaComMesmoNome) {
-      return res.status(409).json({ message: 'Nome da marca já está em uso' });
+      res.status(409).json({ message: 'Nome da marca já está em uso' });
+      return;
     }
 
     const marca = await prisma.marca.update({
@@ -127,7 +133,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // Deletar marca
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -144,15 +150,17 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!marca) {
-      return res.status(404).json({ message: 'Marca não encontrada' });
+      res.status(404).json({ message: 'Marca não encontrada' });
+      return;
     }
 
     // Verificar se existem carros associados
-    const temCarros = marca.modelos.some(modelo => modelo.carros.length > 0);
+    const temCarros = marca.modelos.some((modelo: any) => modelo.carros.length > 0);
     if (temCarros) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Não é possível excluir a marca pois existem carros associados' 
       });
+      return;
     }
 
     await prisma.marca.delete({

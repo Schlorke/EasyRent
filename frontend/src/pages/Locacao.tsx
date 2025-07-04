@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { carroService } from '../services/api';
-import { Carro } from '../types';
+import type { Carro } from '../types';
 import { Search, Car, Calendar, MapPin } from 'lucide-react';
 
 const Locacao: React.FC = () => {

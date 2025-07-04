@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Usuario, Marca, Modelo, Carro, LoginRequest, LoginResponse } from '../types';
+import type { Usuario, Marca, Modelo, Carro, LoginRequest, LoginResponse } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 

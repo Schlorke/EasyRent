@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { marcaService, carroService, modeloService } from '../services/api';
-import { Marca, Carro, Modelo } from '../types';
+import type { Marca, Carro, Modelo } from '../types';
 import { Plus, Edit, Trash2, Car, Tag } from 'lucide-react';
 
 const Admin: React.FC = () => {

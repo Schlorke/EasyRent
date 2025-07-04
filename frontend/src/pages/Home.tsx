@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Card, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Car, Users, Shield, Clock } from 'lucide-react';
 
 const Home: React.FC = () => {

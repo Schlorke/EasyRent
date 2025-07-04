@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import prisma from '../services/prisma';
@@ -6,12 +6,13 @@ import prisma from '../services/prisma';
 const router = Router();
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, senha } = req.body;
 
     if (!email || !senha) {
-      return res.status(400).json({ message: 'Email e senha são obrigatórios' });
+      res.status(400).json({ message: 'Email e senha são obrigatórios' });
+      return;
     }
 
     // Buscar usuário
@@ -20,19 +21,22 @@ router.post('/login', async (req, res) => {
     });
 
     if (!usuario) {
-      return res.status(401).json({ message: 'Credenciais inválidas' });
+      res.status(401).json({ message: 'Credenciais inválidas' });
+      return;
     }
 
     // Verificar senha
     const senhaValida = await bcrypt.compare(senha, usuario.senha);
     if (!senhaValida) {
-      return res.status(401).json({ message: 'Credenciais inválidas' });
+      res.status(401).json({ message: 'Credenciais inválidas' });
+      return;
     }
 
     // Gerar JWT
     const JWT_SECRET = process.env.JWT_SECRET;
     if (!JWT_SECRET) {
-      return res.status(500).json({ message: 'Configuração JWT inválida' });
+      res.status(500).json({ message: 'Configuração JWT inválida' });
+      return;
     }
 
     const token = jwt.sign(

@@ -1,30 +1,23 @@
-# Use Node.js LTS
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install ALL dependencies
+RUN npm ci
 
-# Copy source code
+# Copy all files
 COPY . .
-
-# Generate Prisma client
-RUN npx prisma generate
 
 # Build TypeScript
 RUN npm run build
 
-# Expose port
+# Make start.sh executable
+RUN chmod +x start.sh
+
 EXPOSE 4000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node healthcheck.js
-
-# Start the application
-CMD ["npm", "start"] 
+# Use the start script
+CMD ["./start.sh"] 

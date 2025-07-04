@@ -1,11 +1,11 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import prisma from '../services/prisma';
 import { authenticateToken } from '../middleware/auth';
 
 const router = Router();
 
 // Listar todos os modelos
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const modelos = await prisma.modelo.findMany({
       include: {
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 });
 
 // Listar modelos por marca
-router.get('/marca/:marcaId', async (req, res) => {
+router.get('/marca/:marcaId', async (req: Request, res: Response): Promise<void> => {
   try {
     const { marcaId } = req.params;
 
@@ -48,7 +48,7 @@ router.get('/marca/:marcaId', async (req, res) => {
 });
 
 // Obter modelo por ID
-router.get('/:id', async (req, res) => {
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -61,7 +61,8 @@ router.get('/:id', async (req, res) => {
     });
 
     if (!modelo) {
-      return res.status(404).json({ message: 'Modelo não encontrado' });
+      res.status(404).json({ message: 'Modelo não encontrado' });
+      return;
     }
 
     res.json(modelo);
@@ -72,14 +73,15 @@ router.get('/:id', async (req, res) => {
 });
 
 // Criar novo modelo
-router.post('/', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { codigo, descricao, marcaId } = req.body;
 
     if (!codigo || !descricao || !marcaId) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Código, descrição e marca são obrigatórios' 
       });
+      return;
     }
 
     // Verificar se a marca existe
@@ -88,7 +90,8 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     if (!marca) {
-      return res.status(404).json({ message: 'Marca não encontrada' });
+      res.status(404).json({ message: 'Marca não encontrada' });
+      return;
     }
 
     // Verificar se o código já existe
@@ -97,7 +100,8 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     if (modeloExistente) {
-      return res.status(409).json({ message: 'Código do modelo já cadastrado' });
+      res.status(409).json({ message: 'Código do modelo já cadastrado' });
+      return;
     }
 
     const modelo = await prisma.modelo.create({
@@ -119,15 +123,16 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Atualizar modelo
-router.put('/:id', authenticateToken, async (req, res) => {
+router.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { codigo, descricao, marcaId } = req.body;
 
     if (!codigo || !descricao || !marcaId) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Código, descrição e marca são obrigatórios' 
       });
+      return;
     }
 
     // Verificar se o modelo existe
@@ -136,7 +141,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!modeloExistente) {
-      return res.status(404).json({ message: 'Modelo não encontrado' });
+      res.status(404).json({ message: 'Modelo não encontrado' });
+      return;
     }
 
     // Verificar se a marca existe
@@ -145,7 +151,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!marca) {
-      return res.status(404).json({ message: 'Marca não encontrada' });
+      res.status(404).json({ message: 'Marca não encontrada' });
+      return;
     }
 
     // Verificar se o código já está em uso por outro modelo
@@ -157,7 +164,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
     });
 
     if (modeloComMesmoCodigo) {
-      return res.status(409).json({ message: 'Código do modelo já está em uso' });
+      res.status(409).json({ message: 'Código do modelo já está em uso' });
+      return;
     }
 
     const modelo = await prisma.modelo.update({
@@ -180,7 +188,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 });
 
 // Deletar modelo
-router.delete('/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
@@ -193,14 +201,16 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     });
 
     if (!modelo) {
-      return res.status(404).json({ message: 'Modelo não encontrado' });
+      res.status(404).json({ message: 'Modelo não encontrado' });
+      return;
     }
 
     // Verificar se existem carros associados
     if (modelo.carros.length > 0) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         message: 'Não é possível excluir o modelo pois existem carros associados' 
       });
+      return;
     }
 
     await prisma.modelo.delete({

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import prisma from '../services/prisma';
 import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
@@ -6,12 +6,13 @@ import { authenticateToken, AuthenticatedRequest } from '../middleware/auth';
 const router = Router();
 
 // Criar usuário
-router.post('/', async (req, res) => {
+router.post('/', async (req: Request, res: Response): Promise<void> => {
   try {
     const { nome, email, senha } = req.body;
 
     if (!nome || !email || !senha) {
-      return res.status(400).json({ message: 'Nome, email e senha são obrigatórios' });
+      res.status(400).json({ message: 'Nome, email e senha são obrigatórios' });
+      return;
     }
 
     // Verificar se o email já existe
@@ -20,7 +21,8 @@ router.post('/', async (req, res) => {
     });
 
     if (usuarioExistente) {
-      return res.status(409).json({ message: 'Email já cadastrado' });
+      res.status(409).json({ message: 'Email já cadastrado' });
+      return;
     }
 
     // Criptografar senha
@@ -50,7 +52,7 @@ router.post('/', async (req, res) => {
 });
 
 // Obter perfil do usuário autenticado
-router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res) => {
+router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   try {
     const usuario = await prisma.usuario.findUnique({
       where: { id: req.userId },
@@ -64,7 +66,8 @@ router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res)
     });
 
     if (!usuario) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+      res.status(404).json({ message: 'Usuário não encontrado' });
+      return;
     }
 
     res.json(usuario);
@@ -75,7 +78,7 @@ router.get('/profile', authenticateToken, async (req: AuthenticatedRequest, res)
 });
 
 // Listar todos os usuários (protegido)
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const usuarios = await prisma.usuario.findMany({
       select: {
