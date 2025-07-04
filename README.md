@@ -128,7 +128,45 @@ cp frontend/.env.example frontend/.env
 # Editar as variáveis conforme necessário
 ```
 
-### **3. Executar com Docker Compose**
+### **3. Desenvolvimento Local (Recomendado)**
+
+#### **Scripts de Desenvolvimento**
+```bash
+# Ver todos os comandos disponíveis
+./dev.sh help
+
+# Iniciar apenas backend
+./dev.sh start
+
+# Testar endpoints do backend
+./dev.sh test
+
+# Iniciar frontend
+./dev.sh frontend
+
+# Iniciar backend + frontend
+./dev.sh full
+
+# Parar todos os serviços
+./dev.sh stop
+
+# Deploy para Railway
+./dev.sh deploy
+```
+
+#### **Scripts do Backend**
+```bash
+# Entrar no diretório do backend
+cd backend
+
+# Iniciar em desenvolvimento
+./start.dev.sh
+
+# Testar endpoints
+./test.dev.sh
+```
+
+### **4. Executar com Docker Compose**
 ```bash
 # Construir e executar todos os serviços
 docker-compose up --build
@@ -137,7 +175,7 @@ docker-compose up --build
 docker-compose up -d --build
 ```
 
-### **4. Executar em Desenvolvimento**
+### **5. Executar em Desenvolvimento Manual**
 
 **Backend:**
 ```bash

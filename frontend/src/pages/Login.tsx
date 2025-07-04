@@ -79,6 +79,7 @@ const Login: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-11 h-12 border-2 border-gray-300 focus:border-blue-500 rounded-lg"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -97,6 +98,7 @@ const Login: React.FC = () => {
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
                     className="pl-11 h-12 border-2 border-gray-300 focus:border-blue-500 rounded-lg"
+                    autoComplete="current-password"
                     required
                   />
                 </div>

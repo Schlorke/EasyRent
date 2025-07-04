@@ -24,7 +24,7 @@ const Home: React.FC = () => {
                 Ver Veículos
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+            <Button asChild size="lg" variant="outline" className="border-white text-white bg-transparent hover:bg-white hover:text-blue-600">
               <Link to="/cadastro">
                 <Users className="mr-2 h-5 w-5" />
                 Cadastrar-se

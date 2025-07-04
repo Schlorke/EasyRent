@@ -104,6 +104,7 @@ const Cadastro: React.FC = () => {
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     className="pl-10"
+                    autoComplete="name"
                     required
                   />
                 </div>
@@ -122,6 +123,7 @@ const Cadastro: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -140,6 +142,7 @@ const Cadastro: React.FC = () => {
                     value={senha}
                     onChange={(e) => setSenha(e.target.value)}
                     className="pl-10"
+                    autoComplete="new-password"
                     required
                   />
                 </div>
@@ -158,6 +161,7 @@ const Cadastro: React.FC = () => {
                     value={confirmarSenha}
                     onChange={(e) => setConfirmarSenha(e.target.value)}
                     className="pl-10"
+                    autoComplete="new-password"
                     required
                   />
                 </div>
