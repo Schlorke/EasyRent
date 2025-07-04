@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    depends_on:
+      - backend
+    networks:
+      - easyrent-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - DATABASE_URL=postgresql://postgres:PNzcAbIcNZroTojpqTqZrXmYJDNSxRoF@hopper.proxy.rlwy.net:31128/railway
+      - JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+      - FRONTEND_URL=http://localhost:5173
+    networks:
+      - easyrent-network
+    restart: unless-stopped
+
+networks:
+  easyrent-network:
+    driver: bridge
+
+volumes:
+  postgres_data: 

@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id       String @id @default(cuid())
+  nome     String
+  email    String @unique
+  senha    String
+  locacoes Locacao[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("usuarios")
+}
+
+model Marca {
+  id      String @id @default(cuid())
+  nome    String @unique
+  modelos Modelo[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("marcas")
+}
+
+model Modelo {
+  id        String @id @default(cuid())
+  codigo    String @unique
+  descricao String
+  marcaId   String
+  marca     Marca  @relation(fields: [marcaId], references: [id], onDelete: Cascade)
+  carros    Carro[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("modelos")
+}
+
+model Carro {
+  id          String @id @default(cuid())
+  codigo      String @unique
+  modeloId    String
+  ano         Int
+  cor         String
+  descricao   String
+  observacoes String?
+  modelo      Modelo @relation(fields: [modeloId], references: [id], onDelete: Cascade)
+  locacoes    Locacao[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("carros")
+}
+
+model Locacao {
+  id             String   @id @default(cuid())
+  codigo         String   @unique
+  carroId        String
+  usuarioId      String
+  dataRetirada   DateTime
+  dataDevolucao  DateTime
+  valor          Float
+  observacoes    String?
+  carro          Carro    @relation(fields: [carroId], references: [id], onDelete: Cascade)
+  usuario        Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("locacoes")
+}
