@@ -7,7 +7,9 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+# Fix for Rollup on ARM64 architecture
+RUN rm -rf node_modules package-lock.json && \
+    npm install
 
 # Copy source code
 COPY . .
