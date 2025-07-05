@@ -12,6 +12,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 
 // Importar rotas
@@ -43,6 +44,11 @@ app.use(cors({
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir imagens estáticas em desenvolvimento
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/images', express.static(path.join(__dirname, '../../frontend/public/images')));
+}
 
 // Rotas
 app.use('/auth', authRoutes);

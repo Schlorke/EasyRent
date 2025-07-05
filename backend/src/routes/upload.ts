@@ -7,7 +7,10 @@ import { authenticateToken } from '../middleware/auth';
 const router = Router();
 
 // Configurar o diretório de destino
-const uploadDir = path.join(__dirname, '../../..', 'frontend/public/images/carros');
+// Em produção, usamos um diretório temporário pois as imagens são servidas pelo frontend
+const uploadDir = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, '../../uploads')
+  : path.join(__dirname, '../../..', 'frontend/public/images/carros');
 
 // Criar diretório se não existir
 if (!fs.existsSync(uploadDir)) {
