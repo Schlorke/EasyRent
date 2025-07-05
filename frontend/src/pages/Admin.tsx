@@ -5,6 +5,7 @@ import { Input } from '../components/ui/Input';
 import { marcaService, carroService, modeloService } from '../services/api';
 import type { Marca, Carro, Modelo } from '../types';
 import { Plus, Edit, Trash2, Car, Tag } from 'lucide-react';
+import ImageUpload from '../components/ImageUpload';
 
 const Admin: React.FC = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -510,15 +511,11 @@ const Admin: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Imagem do Veículo
                     </label>
-                    <Input
-                      type="text"
-                      placeholder="Digite o nome da imagem (ex: civic.jpg)"
-                      value={carroForm.imagem}
-                      onChange={(e) => setCarroForm({ ...carroForm, imagem: e.target.value })}
+                    <ImageUpload
+                      currentImage={carroForm.imagem}
+                      onImageChange={(filename) => setCarroForm({ ...carroForm, imagem: filename })}
+                      disabled={false}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Coloque a imagem na pasta /public/images/carros/ e digite apenas o nome do arquivo
-                    </p>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">

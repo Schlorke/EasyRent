@@ -11,6 +11,7 @@ import marcaRoutes from './routes/marca';
 import modeloRoutes from './routes/modelo';
 import carroRoutes from './routes/carro';
 import authRoutes from './routes/auth';
+import uploadRoutes from './routes/upload';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use('/usuarios', usuarioRoutes);
 app.use('/marcas', marcaRoutes);
 app.use('/modelos', modeloRoutes);
 app.use('/carros', carroRoutes);
+app.use('/upload', uploadRoutes);
 
 // Rota de healthcheck
 app.get('/health', (req, res) => {

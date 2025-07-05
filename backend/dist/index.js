@@ -15,6 +15,7 @@ const marca_1 = __importDefault(require("./routes/marca"));
 const modelo_1 = __importDefault(require("./routes/modelo"));
 const carro_1 = __importDefault(require("./routes/carro"));
 const auth_1 = __importDefault(require("./routes/auth"));
+const upload_1 = __importDefault(require("./routes/upload"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const prisma = new client_1.PrismaClient();
@@ -22,7 +23,11 @@ const PORT = process.env.PORT || 4000;
 // Middlewares
 app.use((0, helmet_1.default)());
 app.use((0, cors_1.default)({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
+    ],
     credentials: true,
 }));
 app.use((0, morgan_1.default)('combined'));
@@ -34,6 +39,7 @@ app.use('/usuarios', usuario_1.default);
 app.use('/marcas', marca_1.default);
 app.use('/modelos', modelo_1.default);
 app.use('/carros', carro_1.default);
+app.use('/upload', upload_1.default);
 // Rota de healthcheck
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });

@@ -131,4 +131,28 @@ export const carroService = {
   },
 };
 
+// Serviços de upload
+export const uploadService = {
+  async uploadCarImage(file: File): Promise<{ filename: string; path: string }> {
+    const formData = new FormData();
+    formData.append('image', file);
+    
+    const response = await api.post('/upload/carro-image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  async deleteCarImage(filename: string): Promise<void> {
+    await api.delete(`/upload/carro-image/${filename}`);
+  },
+
+  async getCarImages(): Promise<Array<{ filename: string; path: string }>> {
+    const response = await api.get('/upload/carro-images');
+    return response.data;
+  },
+};
+
 export default api; 
