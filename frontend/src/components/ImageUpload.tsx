@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
 import { uploadService } from '../services/api';
-import { Upload, X, Image as ImageIcon, FolderOpen } from 'lucide-react';
+import { Upload, X, FolderOpen } from 'lucide-react';
 import ImageSelector from './ImageSelector';
 
 interface ImageUploadProps {

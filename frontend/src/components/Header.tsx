@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
-import { Car, User, LogOut, Settings } from 'lucide-react';
+import { User, LogOut, Settings } from 'lucide-react';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
