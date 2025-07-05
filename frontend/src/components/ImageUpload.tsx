@@ -78,16 +78,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     <div className="space-y-4">
       {/* Preview da imagem */}
       {getCurrentImageSrc() && (
-        <div className="relative">
-          <img
-            src={getCurrentImageSrc()!}
-            alt="Preview"
-            className="w-full h-48 object-cover rounded-lg border"
-          />
+        <div className="relative bg-gray-50 rounded-lg border overflow-hidden">
+          <div className="aspect-[16/9] w-full">
+            <img
+              src={getCurrentImageSrc()!}
+              alt="Preview"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
             disabled={disabled}
           >
             <X className="h-4 w-4" />
