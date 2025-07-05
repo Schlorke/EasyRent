@@ -45,8 +45,12 @@ app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Servir imagens estáticas em desenvolvimento
-if (process.env.NODE_ENV !== 'production') {
+// Servir imagens estáticas
+if (process.env.NODE_ENV === 'production') {
+  // Em produção, servir do volume persistente
+  app.use('/uploads', express.static('/app/uploads'));
+} else {
+  // Em desenvolvimento, servir do frontend
   app.use('/images', express.static(path.join(__dirname, '../../frontend/public/images')));
 }
 

@@ -113,7 +113,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
                     {/* Imagem */}
                     <div className="aspect-[4/3] overflow-hidden rounded-t-lg">
                       <img
-                        src={`/images/carros/${image.filename}`}
+                        src={image.path || `/images/carros/${image.filename}`}
                         alt={image.filename}
                         className="w-full h-full object-cover"
                         onError={(e) => {

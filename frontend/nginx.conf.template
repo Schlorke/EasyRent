@@ -1,12 +1,36 @@
 server {
     listen 80;
     server_name localhost;
+
     root /usr/share/nginx/html;
     index index.html;
 
-    # Handle client-side routing
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # Gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 10240;
+    gzip_proxied expired no-cache no-store private auth;
+    gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml application/javascript application/json;
+    gzip_disable "MSIE [1-6]\.";
+
+    # Handle React Router
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    # Handle API requests
+    location /api {
+        proxy_pass ${VITE_API_URL};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
     }
 
     # Handle images specifically
@@ -19,7 +43,7 @@ server {
 
     # Proxy uploads to backend (for uploaded images)
     location /uploads/ {
-        proxy_pass $BACKEND_URL/uploads/;
+        proxy_pass ${VITE_API_URL}/uploads/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -42,15 +66,10 @@ server {
         try_files $uri =404;
     }
 
-    # Security headers
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
-
-    # Gzip compression
-    gzip on;
-    gzip_vary on;
-    gzip_min_length 1024;
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/xml+rss application/json;
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
 } 

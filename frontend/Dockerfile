@@ -41,11 +41,14 @@ COPY --from=build /app/dist /usr/share/nginx/html
 COPY --from=build /app/public/images /usr/share/nginx/html/images
 COPY --from=build /app/public/assets /usr/share/nginx/html/assets
 
-# Copy nginx configuration
+# Copy nginx configuration template
+COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+
+# Use envsubst to replace environment variables
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Expose port
 EXPOSE 80
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+# Start nginx with environment variable substitution
+CMD ["sh", "-c", "envsubst '${VITE_API_URL}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"] 

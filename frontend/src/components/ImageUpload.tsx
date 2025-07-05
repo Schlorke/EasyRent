@@ -84,7 +84,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
   const getCurrentImageSrc = () => {
     if (preview) return preview;
-    if (currentImage) return `/images/carros/${currentImage}`;
+    if (currentImage) {
+      // Se a imagem já tem um caminho completo (de upload), use-o
+      if (currentImage.startsWith('/')) return currentImage;
+      // Senão, assume que é uma imagem na pasta padrão
+      return `/images/carros/${currentImage}`;
+    }
     return null;
   };
 

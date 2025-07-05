@@ -3,13 +3,14 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import { authenticateToken } from '../middleware/auth';
+import { imageService } from '../services/imageService';
 
 const router = Router();
 
 // Configurar o diretório de destino
-// Em produção, usamos um diretório temporário pois as imagens são servidas pelo frontend
+// Em produção, usamos o volume persistente montado em /app/uploads
 const uploadDir = process.env.NODE_ENV === 'production' 
-  ? path.join(__dirname, '../../uploads')
+  ? '/app/uploads/carros'
   : path.join(__dirname, '../../..', 'frontend/public/images/carros');
 
 // Criar diretório se não existir
@@ -60,11 +61,12 @@ router.post('/carro-image', authenticateToken, upload.single('image'), async (re
 
     // Retornar apenas o nome do arquivo
     const filename = req.file.filename;
+    const imagePath = imageService.getImagePath(filename);
     
     res.json({
       message: 'Imagem enviada com sucesso',
       filename: filename,
-      path: `/images/carros/${filename}`
+      path: imagePath
     });
   } catch (error) {
     console.error('Erro no upload:', error);
@@ -97,17 +99,7 @@ router.delete('/carro-image/:filename', authenticateToken, async (req: Request, 
 // Rota para listar imagens disponíveis
 router.get('/carro-images', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
-    const files = fs.readdirSync(uploadDir);
-    const imageFiles = files.filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
-    });
-    
-    const images = imageFiles.map(file => ({
-      filename: file,
-      path: `/images/carros/${file}`
-    }));
-    
+    const images = imageService.getAllImages();
     res.json(images);
   } catch (error) {
     console.error('Erro ao listar imagens:', error);
