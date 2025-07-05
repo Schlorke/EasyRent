@@ -152,7 +152,7 @@ $RECYCLE.BIN/
 # ==========================================
 # PACKAGE MANAGERS
 # ==========================================
-package-lock.json
+# package-lock.json  # Necessário para npm ci no Railway
 yarn.lock
 pnpm-lock.yaml
 
