@@ -68,6 +68,13 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     onImageChange('');
   };
 
+  // Limpar preview quando a imagem atual mudar (para casos de reset do formulário)
+  React.useEffect(() => {
+    if (!currentImage) {
+      setPreview(null);
+    }
+  }, [currentImage]);
+
   const getCurrentImageSrc = () => {
     if (preview) return preview;
     if (currentImage) return `/images/carros/${currentImage}`;

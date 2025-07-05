@@ -80,6 +80,8 @@ const Admin: React.FC = () => {
         ...carroForm,
         ano: parseInt(carroForm.ano)
       });
+      
+      // Limpar formulário
       setCarroForm({
         codigo: '',
         modeloId: '',
@@ -89,9 +91,14 @@ const Admin: React.FC = () => {
         observacoes: '',
         imagem: ''
       });
-      loadData();
+      
+      // Recarregar dados
+      await loadData();
+      
+      alert('✅ Carro cadastrado com sucesso!');
     } catch (error) {
       console.error('Erro ao criar carro:', error);
+      alert('❌ Erro ao criar carro. Tente novamente.');
     }
   };
 
@@ -182,7 +189,11 @@ const Admin: React.FC = () => {
         ...carroForm,
         ano: parseInt(carroForm.ano)
       });
+      
+      // Limpar estado de edição primeiro
       setEditingCarro(null);
+      
+      // Depois limpar o formulário
       setCarroForm({
         codigo: '',
         modeloId: '',
@@ -192,7 +203,11 @@ const Admin: React.FC = () => {
         observacoes: '',
         imagem: ''
       });
-      loadData();
+      
+      // Recarregar dados
+      await loadData();
+      
+      alert('✅ Carro atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar carro:', error);
       alert('❌ Erro ao atualizar carro. Tente novamente.');
@@ -566,21 +581,47 @@ const Admin: React.FC = () => {
                           : 'bg-gray-50'
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-lg">
-                          {carro.modelo?.marca?.nome} {carro.modelo?.descricao}
-                        </h3>
-                        {editingCarro === carro.id && (
-                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            Editando
-                          </span>
-                        )}
+                      <div className="flex items-start space-x-3 mb-3">
+                        {/* Imagem do carro */}
+                        <div className="flex-shrink-0 w-16 h-12 bg-gray-200 rounded-md overflow-hidden">
+                          {carro.imagem ? (
+                            <img
+                              src={`/images/carros/${carro.imagem}`}
+                              alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/images/car-placeholder.svg';
+                              }}
+                            />
+                          ) : (
+                            <img
+                              src="/images/car-placeholder.svg"
+                              alt="Sem imagem"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                        
+                        {/* Informações do carro */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <h3 className="font-medium text-lg truncate">
+                              {carro.modelo?.marca?.nome} {carro.modelo?.descricao}
+                            </h3>
+                            {editingCarro === carro.id && (
+                              <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full flex-shrink-0 ml-2">
+                                Editando
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-gray-600 truncate">{carro.descricao}</p>
+                          <p className="text-sm text-gray-600">
+                            {carro.ano} - {carro.cor}
+                          </p>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-600">{carro.descricao}</p>
-                      <p className="text-sm text-gray-600">
-                        {carro.ano} - {carro.cor}
-                      </p>
-                      <div className="mt-4 flex space-x-2">
+                      
+                      <div className="flex space-x-2">
                         <Button 
                           size="sm" 
                           variant="outline"
