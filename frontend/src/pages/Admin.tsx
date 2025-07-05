@@ -5,7 +5,7 @@ import { Input } from '../components/ui/Input';
 import { marcaService, carroService, modeloService } from '../services/api';
 import type { Marca, Carro, Modelo } from '../types';
 import { Plus, Edit, Trash2, Car, Tag } from 'lucide-react';
-import ImageUpload from '../components/ImageUpload';
+import { ImageUpload } from '../components/ImageUpload';
 
 const Admin: React.FC = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -30,6 +30,8 @@ const Admin: React.FC = () => {
 
   // Estados para edição
   const [editingCarro, setEditingCarro] = useState<string | null>(null);
+  const [editingMarca, setEditingMarca] = useState<string | null>(null);
+  const [editingModelo, setEditingModelo] = useState<string | null>(null);
 
   useEffect(() => {
     loadData();
@@ -233,6 +235,62 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleEditMarca = (marca: Marca) => {
+    setEditingMarca(marca.id);
+    setMarcaForm({ nome: marca.nome });
+  };
+
+  const handleCancelEditMarca = () => {
+    setEditingMarca(null);
+    setMarcaForm({ nome: '' });
+  };
+
+  const handleUpdateMarca = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingMarca) return;
+
+    try {
+      await marcaService.update(editingMarca, marcaForm);
+      setEditingMarca(null);
+      setMarcaForm({ nome: '' });
+      await loadData();
+      alert('✅ Marca atualizada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar marca:', error);
+      alert('❌ Erro ao atualizar marca. Tente novamente.');
+    }
+  };
+
+  const handleEditModelo = (modelo: Modelo) => {
+    setEditingModelo(modelo.id);
+    setModeloForm({
+      codigo: modelo.codigo,
+      descricao: modelo.descricao,
+      marcaId: modelo.marcaId
+    });
+  };
+
+  const handleCancelEditModelo = () => {
+    setEditingModelo(null);
+    setModeloForm({ codigo: '', descricao: '', marcaId: '' });
+  };
+
+  const handleUpdateModelo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingModelo) return;
+
+    try {
+      await modeloService.update(editingModelo, modeloForm);
+      setEditingModelo(null);
+      setModeloForm({ codigo: '', descricao: '', marcaId: '' });
+      await loadData();
+      alert('✅ Modelo atualizado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao atualizar modelo:', error);
+      alert('❌ Erro ao atualizar modelo. Tente novamente.');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -299,12 +357,12 @@ const Admin: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5" />
-                  <span>Cadastrar Marca</span>
+                  {editingMarca ? <Edit className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                  <span>{editingMarca ? 'Editar Marca' : 'Cadastrar Marca'}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleCreateMarca} className="space-y-4">
+                <form onSubmit={editingMarca ? handleUpdateMarca : handleCreateMarca} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Nome da Marca
@@ -317,9 +375,21 @@ const Admin: React.FC = () => {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full">
-                    Salvar Marca
-                  </Button>
+                  <div className="flex space-x-4">
+                    <Button type="submit" className="flex-1">
+                      {editingMarca ? 'Atualizar Marca' : 'Salvar Marca'}
+                    </Button>
+                    {editingMarca && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleCancelEditMarca}
+                        className="flex-1"
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -335,10 +405,23 @@ const Admin: React.FC = () => {
               <CardContent>
                 <div className="space-y-2">
                   {marcas.map((marca) => (
-                    <div key={marca.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium">{marca.nome}</span>
+                    <div key={marca.id} className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                      editingMarca === marca.id ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'
+                    }`}>
+                      <div className="flex items-center space-x-2">
+                        <span className="font-medium">{marca.nome}</span>
+                        {editingMarca === marca.id && (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            Editando
+                          </span>
+                        )}
+                      </div>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditMarca(marca)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -363,12 +446,12 @@ const Admin: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5" />
-                  <span>Cadastrar Modelo</span>
+                  {editingModelo ? <Edit className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                  <span>{editingModelo ? 'Editar Modelo' : 'Cadastrar Modelo'}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleCreateModelo} className="space-y-4">
+                <form onSubmit={editingModelo ? handleUpdateModelo : handleCreateModelo} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Código
@@ -411,9 +494,21 @@ const Admin: React.FC = () => {
                       ))}
                     </select>
                   </div>
-                  <Button type="submit" className="w-full">
-                    Salvar Modelo
-                  </Button>
+                  <div className="flex space-x-4">
+                    <Button type="submit" className="flex-1">
+                      {editingModelo ? 'Atualizar Modelo' : 'Salvar Modelo'}
+                    </Button>
+                    {editingModelo && (
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        onClick={handleCancelEditModelo}
+                        className="flex-1"
+                      >
+                        Cancelar
+                      </Button>
+                    )}
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -426,13 +521,26 @@ const Admin: React.FC = () => {
               <CardContent>
                 <div className="space-y-2">
                   {modelos.map((modelo) => (
-                    <div key={modelo.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <span className="font-medium">{modelo.descricao}</span>
+                    <div key={modelo.id} className={`flex items-center justify-between p-3 rounded-lg transition-all ${
+                      editingModelo === modelo.id ? 'bg-blue-50 border-2 border-blue-200' : 'bg-gray-50'
+                    }`}>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium">{modelo.descricao}</span>
+                          {editingModelo === modelo.id && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                              Editando
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-gray-600">{modelo.marca?.nome}</p>
                       </div>
                       <div className="flex space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditModelo(modelo)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
@@ -545,12 +653,11 @@ const Admin: React.FC = () => {
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Imagem do Veículo
+                      Imagem do Carro
                     </label>
                     <ImageUpload
-                      currentImage={carroForm.imagem}
-                      onImageChange={(filename) => setCarroForm({ ...carroForm, imagem: filename })}
-                      disabled={false}
+                      value={carroForm.imagem}
+                      onChange={(value) => setCarroForm({ ...carroForm, imagem: value })}
                     />
                   </div>
                   <div className="md:col-span-2">
@@ -604,28 +711,19 @@ const Admin: React.FC = () => {
                     >
                       <div className="flex items-start space-x-3 mb-3">
                         {/* Imagem do carro */}
-                        <div className="flex-shrink-0 w-16 h-12 bg-gray-200 rounded-md overflow-hidden">
-                          {carro.imagem ? (
+                        {carro.imagem && (
+                          <div className="w-16 h-12 flex-shrink-0">
                             <img
-                              src={
-                            carro.imagem?.startsWith('upload:') 
-                              ? `/uploads/carros/${carro.imagem.substring(7)}`
-                              : `/images/carros/${carro.imagem}`
-                          }
-                              alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
-                              className="w-full h-full object-cover"
+                              src={carro.imagem}
+                              alt={`${carro.modelo?.marca?.nome || ''} ${carro.modelo?.descricao || ''}`}
+                              className="w-full h-full object-cover rounded"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = '/images/car-placeholder.svg';
+                                const target = e.target as HTMLImageElement;
+                                target.src = '/car-icon.svg';
                               }}
                             />
-                          ) : (
-                            <img
-                              src="/images/car-placeholder.svg"
-                              alt="Sem imagem"
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                        </div>
+                          </div>
+                        )}
                         
                         {/* Informações do carro */}
                         <div className="flex-1 min-w-0">

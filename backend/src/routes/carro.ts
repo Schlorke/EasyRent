@@ -193,7 +193,28 @@ router.post('/', authenticateToken, async (req: Request, res: Response): Promise
     res.status(201).json(carro);
   } catch (error) {
     console.error('Erro ao criar carro:', error);
-    res.status(500).json({ message: 'Erro interno do servidor' });
+    
+    // Verificar se é erro de payload muito grande
+    if (error instanceof Error && error.message.includes('PayloadTooLargeError')) {
+      res.status(413).json({ 
+        message: 'Imagem muito grande. Tente uma imagem menor (máximo 50MB).' 
+      });
+      return;
+    }
+    
+    // Verificar se é erro do Prisma
+    if (error instanceof Error && error.message.includes('Prisma')) {
+      console.error('❌ Erro específico do Prisma:', error.message);
+      res.status(500).json({ 
+        message: 'Erro de banco de dados: ' + error.message 
+      });
+      return;
+    }
+    
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    });
   }
 });
 
@@ -202,6 +223,18 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response): Promi
   try {
     const { id } = req.params;
     const { codigo, modeloId, ano, cor, descricao, observacoes, imagem, valor } = req.body;
+
+    console.log('🔄 Atualizando carro:', id);
+    console.log('📊 Dados recebidos:', {
+      codigo,
+      modeloId,
+      ano,
+      cor,
+      descricao,
+      observacoes,
+      imagemSize: imagem ? imagem.length : 0,
+      valor
+    });
 
     if (!codigo || !modeloId || !ano || !cor || !descricao || !valor) {
       res.status(400).json({ 
@@ -253,6 +286,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response): Promi
       return;
     }
 
+    console.log('✅ Validações passaram, atualizando no banco...');
+
     const carro = await prisma.carro.update({
       where: { id },
       data: {
@@ -274,10 +309,32 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response): Promi
       }
     });
 
+    console.log('✅ Carro atualizado com sucesso');
     res.json(carro);
   } catch (error) {
-    console.error('Erro ao atualizar carro:', error);
-    res.status(500).json({ message: 'Erro interno do servidor' });
+    console.error('❌ Erro ao atualizar carro:', error);
+    
+    // Verificar se é erro de payload muito grande
+    if (error instanceof Error && error.message.includes('PayloadTooLargeError')) {
+      res.status(413).json({ 
+        message: 'Imagem muito grande. Tente uma imagem menor (máximo 50MB).' 
+      });
+      return;
+    }
+    
+    // Verificar se é erro do Prisma
+    if (error instanceof Error && error.message.includes('Prisma')) {
+      console.error('❌ Erro específico do Prisma:', error.message);
+      res.status(500).json({ 
+        message: 'Erro de banco de dados: ' + error.message 
+      });
+      return;
+    }
+    
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    });
   }
 });
 

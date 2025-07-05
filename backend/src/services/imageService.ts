@@ -1,93 +1,87 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 import path from 'path';
 
-// Imagens pré-existentes que sempre estarão disponíveis
-const preExistingImages = [
-  'civic.jpg',
-  'corolla.jpg',
-  'golf.jpg',
-  'hrv.jpg',
-  'jeep_compass.jpg',
-  'mustang.jpg',
-  'ranger.jpg',
-  'sw4.jpg'
-];
+export class ImageService {
+  private uploadsDir: string;
 
-export const imageService = {
-  // Obter todas as imagens disponíveis (pré-existentes + uploads)
-  getAllImages: () => {
-    const images: Array<{ filename: string; path: string; isPreExisting: boolean }> = [];
-    
-    // Adicionar imagens pré-existentes
-    preExistingImages.forEach(filename => {
-      images.push({
-        filename,
-        path: `/images/carros/${filename}`,
-        isPreExisting: true
-      });
-    });
-    
-    // Adicionar imagens enviadas (se em produção)
-    if (process.env.NODE_ENV === 'production') {
+  constructor() {
+    // Em produção, não vamos mais usar diretório físico
+    this.uploadsDir = path.join(__dirname, '..', '..', 'uploads', 'carros');
+  }
+
+  async init() {
+    // Em produção não precisamos criar diretórios
+    if (process.env.NODE_ENV !== 'production') {
       try {
-        const uploadDir = '/app/uploads/carros';
-        if (fs.existsSync(uploadDir)) {
-          const files = fs.readdirSync(uploadDir);
-          const uploadedImages = files.filter(file => {
-            const ext = path.extname(file).toLowerCase();
-            return ['.jpg', '.jpeg', '.png', '.webp'].includes(ext);
-          });
-          
-          uploadedImages.forEach(filename => {
-            images.push({
-              filename,
-              path: `/uploads/carros/${filename}`,
-              isPreExisting: false
-            });
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao listar uploads:', error);
+        await fs.access(this.uploadsDir);
+      } catch {
+        await fs.mkdir(this.uploadsDir, { recursive: true });
       }
     }
-    
-    return images;
-  },
-  
-  // Verificar se uma imagem existe
-  imageExists: (filename: string): boolean => {
-    // Verificar se é uma imagem pré-existente
-    if (preExistingImages.includes(filename)) {
-      return true;
-    }
-    
-    // Verificar se é um upload
-    if (process.env.NODE_ENV === 'production') {
-      const uploadPath = path.join('/app/uploads/carros', filename);
-      return fs.existsSync(uploadPath);
-    }
-    
-    return false;
-  },
-  
-  // Obter o caminho correto para uma imagem
-  getImagePath: (filename: string): string => {
-    // Se for uma imagem pré-existente
-    if (preExistingImages.includes(filename)) {
-      return `/images/carros/${filename}`;
-    }
-    
-    // Se for um upload em produção, retornar caminho de uploads
-    if (process.env.NODE_ENV === 'production') {
-      return `/uploads/carros/${filename}`;
-    }
-    
-    // Em desenvolvimento, todas as imagens estão no mesmo lugar
-    return `/images/carros/${filename}`;
-  },
-  
-  // Verificar se é um upload (não uma imagem pré-existente)
-  isUpload: (filename: string): boolean => {
-    return !preExistingImages.includes(filename);
   }
-}; 
+
+  // Converte arquivo para Base64
+  async fileToBase64(file: Express.Multer.File): Promise<string> {
+    const base64 = file.buffer.toString('base64');
+    const mimeType = file.mimetype;
+    return `data:${mimeType};base64,${base64}`;
+  }
+
+  // Valida se é uma string Base64 válida
+  isValidBase64Image(str: string): boolean {
+    if (!str) return false;
+    const regex = /^data:image\/(jpeg|jpg|png|webp);base64,/;
+    return regex.test(str);
+  }
+
+  // Extrai informações de uma string Base64
+  getImageInfo(base64String: string) {
+    const matches = base64String.match(/^data:image\/(\w+);base64,(.+)$/);
+    if (!matches) return null;
+    
+    return {
+      mimeType: `image/${matches[1]}`,
+      extension: matches[1],
+      data: matches[2]
+    };
+  }
+
+  // Para manter compatibilidade com código existente
+  async saveFile(file: Express.Multer.File, filename: string): Promise<string> {
+    // Em produção, retornamos apenas o nome do arquivo
+    // O Base64 será salvo diretamente no banco
+    return filename;
+  }
+
+  async deleteFile(filename: string): Promise<void> {
+    // Em produção, não há arquivo físico para deletar
+    if (process.env.NODE_ENV !== 'production') {
+      const filepath = path.join(this.uploadsDir, filename);
+      try {
+        await fs.unlink(filepath);
+      } catch (error) {
+        console.error(`Erro ao deletar arquivo ${filename}:`, error);
+      }
+    }
+  }
+
+  async listFiles(): Promise<string[]> {
+    // Em produção, retornamos array vazio
+    if (process.env.NODE_ENV === 'production') {
+      return [];
+    }
+
+    try {
+      const files = await fs.readdir(this.uploadsDir);
+      return files.filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file));
+    } catch {
+      return [];
+    }
+  }
+
+  getFileUrl(filename: string): string {
+    return `/images/carros/${filename}`;
+  }
+}
+
+export const imageService = new ImageService(); 

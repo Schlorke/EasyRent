@@ -42,8 +42,8 @@ app.use(cors({
   credentials: true,
 }));
 app.use(morgan('combined'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Servir imagens estáticas
 if (process.env.NODE_ENV === 'production') {
@@ -71,6 +71,15 @@ app.get('/health', (req, res) => {
 // Middleware de erro global
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
+  
+  // Verificar se é erro de payload muito grande
+  if (err.type === 'entity.too.large') {
+    res.status(413).json({ 
+      message: 'Dados muito grandes. Tente uma imagem menor (máximo 50MB).' 
+    });
+    return;
+  }
+  
   res.status(500).json({ message: 'Erro interno do servidor' });
 });
 

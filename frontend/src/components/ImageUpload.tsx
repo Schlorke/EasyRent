@@ -1,208 +1,218 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Upload, X, Check, Loader2 } from 'lucide-react';
 import { Button } from './ui/Button';
-import { uploadService } from '../services/api';
-import { Upload, X, FolderOpen } from 'lucide-react';
-import ImageSelector from './ImageSelector';
+import api from '../services/api';
 
 interface ImageUploadProps {
-  currentImage?: string;
-  onImageChange: (filename: string) => void;
-  disabled?: boolean;
+  value: string;
+  onChange: (value: string) => void;
+  onUploadComplete?: (filename: string, base64: string) => void;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ 
-  currentImage, 
-  onImageChange, 
-  disabled = false 
-}) => {
-  const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [showSelector, setShowSelector] = useState(false);
+export function ImageUpload({ value, onChange, onUploadComplete }: ImageUploadProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [preview, setPreview] = useState<string>('');
+  const [uploadedFilename, setUploadedFilename] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  useEffect(() => {
+    // Se value é uma URL de imagem existente
+    if (value && !value.startsWith('data:')) {
+      setPreview(value);
+      setUploadedFilename('');
+    } 
+    // Se value é Base64
+    else if (value && value.startsWith('data:')) {
+      setPreview(value);
+      setUploadedFilename('uploaded');
+    } 
+    // Se não há valor
+    else {
+      setPreview('');
+      setUploadedFilename('');
+    }
+  }, [value]);
 
+  const validateFile = (file: File): boolean => {
     // Validar tipo de arquivo
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      alert('❌ Apenas arquivos de imagem são permitidos (JPEG, JPG, PNG, WEBP)');
-      return;
+      alert('Por favor, selecione uma imagem JPEG, JPG, PNG ou WEBP');
+      return false;
     }
 
     // Validar tamanho (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('❌ A imagem deve ter no máximo 5MB');
-      return;
+      alert('A imagem deve ter no máximo 5MB');
+      return false;
     }
 
-    setUploading(true);
-    
+    return true;
+  };
+
+  const processFile = async (file: File) => {
+    if (!validateFile(file)) return;
+
+    setIsUploading(true);
+
     try {
-      // Criar preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append('image', file);
 
-      // Fazer upload
-      const result = await uploadService.uploadCarImage(file);
-      // Usar o filename que já inclui o prefixo upload: quando necessário
-      onImageChange(result.filename);
-      
-      alert('✅ Imagem enviada com sucesso!');
+      const response = await api.post('/upload/carro-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.success) {
+        const { filename, base64 } = response.data;
+        
+        // Atualizar preview e estado
+        setPreview(base64);
+        setUploadedFilename(filename);
+        onChange(base64); // Salvar Base64 diretamente
+        
+        if (onUploadComplete) {
+          onUploadComplete(filename, base64);
+        }
+      }
     } catch (error) {
-      console.error('Erro no upload:', error);
-      alert('❌ Erro ao enviar imagem. Tente novamente.');
-      setPreview(null);
+      console.error('Erro ao enviar imagem:', error);
+      alert('Erro ao enviar imagem. Tente novamente.');
     } finally {
-      setUploading(false);
-      // Limpar o input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      setIsUploading(false);
     }
   };
 
-  const handleRemoveImage = () => {
-    setPreview(null);
-    onImageChange('');
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    await processFile(file);
+    
+    // Limpar o input para permitir selecionar o mesmo arquivo novamente
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
-  const handleSelectExisting = (filename: string) => {
-    setPreview(null); // Limpar preview para mostrar a imagem selecionada
-    onImageChange(filename);
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
   };
 
-  // Limpar preview quando a imagem atual mudar (para casos de reset do formulário)
-  React.useEffect(() => {
-    if (!currentImage) {
-      setPreview(null);
-    }
-  }, [currentImage]);
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
 
-  const getCurrentImageSrc = () => {
-    if (preview) return preview;
-    if (currentImage) {
-      // Se a imagem tem o prefixo upload:, use o caminho de uploads
-      if (currentImage.startsWith('upload:')) {
-        return `/uploads/carros/${currentImage.substring(7)}`;
-      }
-      // Se a imagem já tem um caminho completo, use-o
-      if (currentImage.startsWith('/')) return currentImage;
-      // Senão, assume que é uma imagem na pasta padrão
-      return `/images/carros/${currentImage}`;
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      await processFile(files[0]);
     }
-    return null;
+  };
+
+  const handleRemove = () => {
+    setPreview('');
+    setUploadedFilename('');
+    onChange('');
+  };
+
+  const handleButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDropZoneClick = () => {
+    if (!preview) {
+      fileInputRef.current?.click();
+    }
   };
 
   return (
     <div className="space-y-4">
-      {/* Preview da imagem */}
-      {getCurrentImageSrc() && (
-        <div className="relative bg-gray-50 rounded-lg border overflow-hidden">
-          <div className="aspect-[16/9] w-full">
+      {preview ? (
+        <div className="relative">
+          <div className="relative aspect-video overflow-hidden rounded-lg border-2 border-gray-200">
             <img
-              src={getCurrentImageSrc()!}
+              src={preview}
               alt="Preview"
               className="w-full h-full object-cover"
             />
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+              title="Remover imagem"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleRemoveImage}
-            className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-lg"
-            disabled={disabled}
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {uploadedFilename && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-green-600">
+              <Check className="w-4 h-4" />
+              <span>Imagem carregada com sucesso</span>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div 
+          className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+            isDragging 
+              ? 'border-blue-500 bg-blue-50' 
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={handleDropZoneClick}
+        >
+          <Upload className="mx-auto h-12 w-12 text-gray-400" />
+          <p className="mt-2 text-sm text-gray-600">
+            Clique para selecionar ou arraste uma imagem aqui
+          </p>
+          <p className="text-xs text-gray-500">
+            JPEG, JPG, PNG ou WEBP (máx. 5MB)
+          </p>
         </div>
       )}
 
-      {/* Botões de ação */}
-      <div className="space-y-3">
-        {/* Botões principais */}
-        <div className="flex space-x-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading || disabled}
-            className="flex-1"
-          >
-            {uploading ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-                Enviando...
-              </>
-            ) : (
-              <>
-                <Upload className="h-4 w-4 mr-2" />
-                {getCurrentImageSrc() ? 'Alterar Imagem' : 'Enviar Nova'}
-              </>
-            )}
-          </Button>
-
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setShowSelector(true)}
-            disabled={uploading || disabled}
-            className="flex-1"
-          >
-            <FolderOpen className="h-4 w-4 mr-2" />
-            Escolher Existente
-          </Button>
-
-          {getCurrentImageSrc() && (
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleRemoveImage}
-              disabled={disabled}
-              className="px-3"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+      <div className="flex justify-center">
+        <Button
+          type="button"
+          variant={preview ? 'outline' : 'default'}
+          disabled={isUploading}
+          onClick={handleButtonClick}
+          className="relative"
+        >
+          {isUploading ? (
+            <>
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              Enviando...
+            </>
+          ) : (
+            <>
+              <Upload className="w-4 h-4 mr-2" />
+              {preview ? 'Trocar Imagem' : 'Selecionar Imagem'}
+            </>
           )}
-        </div>
-
-        {/* Texto explicativo */}
-        <div className="text-center">
-          <p className="text-xs text-gray-500">
-            📤 Envie uma nova imagem ou 📁 escolha uma já existente
-          </p>
-        </div>
+        </Button>
       </div>
 
-      {/* Input de arquivo (oculto) */}
+      {/* Input de arquivo oculto */}
       <input
         ref={fileInputRef}
         type="file"
+        className="sr-only"
         accept="image/jpeg,image/jpg,image/png,image/webp"
         onChange={handleFileSelect}
-        className="hidden"
-        disabled={disabled}
-      />
-
-      {/* Informações */}
-      <div className="text-xs text-gray-500 space-y-1">
-        <p>📎 Formatos aceitos: JPEG, JPG, PNG, WEBP</p>
-        <p>📏 Tamanho máximo: 5MB</p>
-        <p>🖼️ Recomendado: 800x600px ou superior</p>
-      </div>
-
-      {/* Modal de seleção de imagens */}
-      <ImageSelector
-        isOpen={showSelector}
-        onClose={() => setShowSelector(false)}
-        onSelect={handleSelectExisting}
-        currentImage={currentImage}
+        disabled={isUploading}
       />
     </div>
   );
-};
-
-export default ImageUpload; 
+} 
