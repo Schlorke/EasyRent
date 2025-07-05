@@ -26,6 +26,9 @@ const Admin: React.FC = () => {
     imagem: ''
   });
 
+  // Estados para edição
+  const [editingCarro, setEditingCarro] = useState<string | null>(null);
+
   useEffect(() => {
     loadData();
   }, []);
@@ -140,6 +143,58 @@ const Admin: React.FC = () => {
     } catch (error) {
       console.error('Erro ao excluir modelo:', error);
       alert('❌ Erro ao excluir modelo. Tente novamente.');
+    }
+  };
+
+  const handleEditCarro = (carro: Carro) => {
+    setEditingCarro(carro.id);
+    setCarroForm({
+      codigo: carro.codigo,
+      modeloId: carro.modeloId,
+      ano: carro.ano.toString(),
+      cor: carro.cor,
+      descricao: carro.descricao,
+      observacoes: carro.observacoes || '',
+      imagem: carro.imagem || ''
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCarro(null);
+    setCarroForm({
+      codigo: '',
+      modeloId: '',
+      ano: '',
+      cor: '',
+      descricao: '',
+      observacoes: '',
+      imagem: ''
+    });
+  };
+
+  const handleUpdateCarro = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCarro) return;
+
+    try {
+      await carroService.update(editingCarro, {
+        ...carroForm,
+        ano: parseInt(carroForm.ano)
+      });
+      setEditingCarro(null);
+      setCarroForm({
+        codigo: '',
+        modeloId: '',
+        ano: '',
+        cor: '',
+        descricao: '',
+        observacoes: '',
+        imagem: ''
+      });
+      loadData();
+    } catch (error) {
+      console.error('Erro ao atualizar carro:', error);
+      alert('❌ Erro ao atualizar carro. Tente novamente.');
     }
   };
 
@@ -379,12 +434,12 @@ const Admin: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Plus className="h-5 w-5" />
-                  <span>Cadastrar Carro</span>
+                  {editingCarro ? <Edit className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+                  <span>{editingCarro ? 'Editar Carro' : 'Cadastrar Carro'}</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleCreateCarro} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={editingCarro ? handleUpdateCarro : handleCreateCarro} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Código
@@ -478,9 +533,21 @@ const Admin: React.FC = () => {
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <Button type="submit" className="w-full">
-                      Salvar Carro
-                    </Button>
+                    <div className="flex space-x-4">
+                      <Button type="submit" className="flex-1">
+                        {editingCarro ? 'Atualizar Carro' : 'Salvar Carro'}
+                      </Button>
+                      {editingCarro && (
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={handleCancelEdit}
+                          className="flex-1"
+                        >
+                          Cancelar
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </form>
               </CardContent>
@@ -494,16 +561,34 @@ const Admin: React.FC = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {carros.map((carro) => (
-                    <div key={carro.id} className="p-4 bg-gray-50 rounded-lg">
-                      <h3 className="font-medium text-lg">
-                        {carro.modelo?.marca?.nome} {carro.modelo?.descricao}
-                      </h3>
+                    <div 
+                      key={carro.id} 
+                      className={`p-4 rounded-lg transition-all ${
+                        editingCarro === carro.id 
+                          ? 'bg-blue-50 border-2 border-blue-200' 
+                          : 'bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium text-lg">
+                          {carro.modelo?.marca?.nome} {carro.modelo?.descricao}
+                        </h3>
+                        {editingCarro === carro.id && (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                            Editando
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-600">{carro.descricao}</p>
                       <p className="text-sm text-gray-600">
                         {carro.ano} - {carro.cor}
                       </p>
                       <div className="mt-4 flex space-x-2">
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleEditCarro(carro)}
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                         <Button
