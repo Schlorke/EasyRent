@@ -186,7 +186,13 @@ const Locacao: React.FC = () => {
             <Card key={carro.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-w-16 aspect-h-9 bg-gray-200">
                 <img
-                  src={carro.imagem ? `/images/carros/${carro.imagem}` : '/images/car-placeholder.svg'}
+                                          src={
+                          carro.imagem 
+                            ? (carro.imagem.startsWith('upload:') 
+                                ? `/uploads/carros/${carro.imagem.substring(7)}`
+                                : `/images/carros/${carro.imagem}`)
+                            : '/images/car-placeholder.svg'
+                        }
                   alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
                   className="w-full h-48 object-cover"
                   onError={(e) => {
@@ -268,7 +274,13 @@ const Locacao: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <div className="w-16 h-12 bg-gray-200 rounded-md overflow-hidden">
                     <img
-                      src={selectedCarro.imagem ? `/images/carros/${selectedCarro.imagem}` : '/images/car-placeholder.svg'}
+                      src={
+                        selectedCarro.imagem 
+                          ? (selectedCarro.imagem.startsWith('upload:') 
+                              ? `/uploads/carros/${selectedCarro.imagem.substring(7)}`
+                              : `/images/carros/${selectedCarro.imagem}`)
+                          : '/images/car-placeholder.svg'
+                      }
                       alt={`${selectedCarro.modelo?.marca?.nome} ${selectedCarro.modelo?.descricao}`}
                       className="w-full h-full object-cover"
                       onError={(e) => {

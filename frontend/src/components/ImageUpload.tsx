@@ -49,6 +49,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 
       // Fazer upload
       const result = await uploadService.uploadCarImage(file);
+      // Usar o filename que já inclui o prefixo upload: quando necessário
       onImageChange(result.filename);
       
       alert('✅ Imagem enviada com sucesso!');
@@ -85,7 +86,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
   const getCurrentImageSrc = () => {
     if (preview) return preview;
     if (currentImage) {
-      // Se a imagem já tem um caminho completo (de upload), use-o
+      // Se a imagem tem o prefixo upload:, use o caminho de uploads
+      if (currentImage.startsWith('upload:')) {
+        return `/uploads/carros/${currentImage.substring(7)}`;
+      }
+      // Se a imagem já tem um caminho completo, use-o
       if (currentImage.startsWith('/')) return currentImage;
       // Senão, assume que é uma imagem na pasta padrão
       return `/images/carros/${currentImage}`;

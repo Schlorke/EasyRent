@@ -61,12 +61,16 @@ router.post('/carro-image', authenticateToken, upload.single('image'), async (re
 
     // Retornar apenas o nome do arquivo
     const filename = req.file.filename;
-    const imagePath = imageService.getImagePath(filename);
+    
+    // Em produção, indicar que é um upload adicionando um prefixo
+    const imageIdentifier = process.env.NODE_ENV === 'production' 
+      ? `upload:${filename}`
+      : filename;
     
     res.json({
       message: 'Imagem enviada com sucesso',
-      filename: filename,
-      path: imagePath
+      filename: imageIdentifier,
+      path: imageService.getImagePath(filename)
     });
   } catch (error) {
     console.error('Erro no upload:', error);

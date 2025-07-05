@@ -607,7 +607,11 @@ const Admin: React.FC = () => {
                         <div className="flex-shrink-0 w-16 h-12 bg-gray-200 rounded-md overflow-hidden">
                           {carro.imagem ? (
                             <img
-                              src={`/images/carros/${carro.imagem}`}
+                              src={
+                            carro.imagem?.startsWith('upload:') 
+                              ? `/uploads/carros/${carro.imagem.substring(7)}`
+                              : `/images/carros/${carro.imagem}`
+                          }
                               alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
                               className="w-full h-full object-cover"
                               onError={(e) => {

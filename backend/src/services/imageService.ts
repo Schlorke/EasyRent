@@ -77,12 +77,17 @@ export const imageService = {
       return `/images/carros/${filename}`;
     }
     
-    // Se for um upload em produção
+    // Se for um upload em produção, retornar caminho de uploads
     if (process.env.NODE_ENV === 'production') {
       return `/uploads/carros/${filename}`;
     }
     
     // Em desenvolvimento, todas as imagens estão no mesmo lugar
     return `/images/carros/${filename}`;
+  },
+  
+  // Verificar se é um upload (não uma imagem pré-existente)
+  isUpload: (filename: string): boolean => {
+    return !preExistingImages.includes(filename);
   }
 }; 
