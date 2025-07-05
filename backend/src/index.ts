@@ -1,3 +1,12 @@
+// ==========================================
+// BACKEND - API REST - EasyRent
+// ==========================================
+// Autor: Guilherme Amaral Cardoso
+// Data: 05/07/2025
+// Versão: 1.0.0
+// ==========================================
+
+// ==========================================
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
