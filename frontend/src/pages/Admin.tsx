@@ -92,13 +92,54 @@ const Admin: React.FC = () => {
   };
 
   const handleDeleteMarca = async (id: string) => {
-    if (window.confirm('Tem certeza que deseja excluir esta marca?')) {
-      try {
+    try {
+      // Verificar se há modelos usando esta marca
+      const modelosDaMarca = modelos.filter(modelo => modelo.marcaId === id);
+      
+      if (modelosDaMarca.length > 0) {
+        const marca = marcas.find(m => m.id === id);
+        const listaModelos = modelosDaMarca.map(m => `• ${m.descricao} (${m.codigo})`).join('\n');
+        
+        alert(`❌ Não é possível excluir a marca "${marca?.nome}"!\n\n` +
+              `📊 Existem ${modelosDaMarca.length} modelo(s) cadastrado(s) com esta marca:\n\n` +
+              `${listaModelos}\n\n` +
+              `🔧 Para excluir esta marca, primeiro exclua todos os modelos listados acima.`);
+        return;
+      }
+
+      if (window.confirm('Tem certeza que deseja excluir esta marca?')) {
         await marcaService.delete(id);
         loadData();
-      } catch (error) {
-        console.error('Erro ao excluir marca:', error);
       }
+    } catch (error) {
+      console.error('Erro ao excluir marca:', error);
+      alert('❌ Erro ao excluir marca. Tente novamente.');
+    }
+  };
+
+  const handleDeleteModelo = async (id: string) => {
+    try {
+      // Verificar se há carros usando este modelo
+      const carrosDoModelo = carros.filter(carro => carro.modeloId === id);
+      
+      if (carrosDoModelo.length > 0) {
+        const modelo = modelos.find(m => m.id === id);
+        const listaCarros = carrosDoModelo.map(c => `• ${c.descricao} (${c.codigo})`).join('\n');
+        
+        alert(`❌ Não é possível excluir o modelo "${modelo?.descricao}"!\n\n` +
+              `📊 Existem ${carrosDoModelo.length} carro(s) cadastrado(s) com este modelo:\n\n` +
+              `${listaCarros}\n\n` +
+              `🔧 Para excluir este modelo, primeiro exclua todos os carros listados acima.`);
+        return;
+      }
+
+      if (window.confirm('Tem certeza que deseja excluir este modelo?')) {
+        await modeloService.delete(id);
+        loadData();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir modelo:', error);
+      alert('❌ Erro ao excluir modelo. Tente novamente.');
     }
   };
 
@@ -109,6 +150,7 @@ const Admin: React.FC = () => {
         loadData();
       } catch (error) {
         console.error('Erro ao excluir carro:', error);
+        alert('❌ Erro ao excluir carro. Tente novamente.');
       }
     }
   };
@@ -315,7 +357,11 @@ const Admin: React.FC = () => {
                         <Button size="sm" variant="outline">
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="destructive">
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleDeleteModelo(modelo.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
