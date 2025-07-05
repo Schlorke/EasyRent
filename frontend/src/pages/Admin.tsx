@@ -6,6 +6,7 @@ import { marcaService, carroService, modeloService } from '../services/api';
 import type { Marca, Carro, Modelo } from '../types';
 import { Plus, Edit, Trash2, Car, Tag } from 'lucide-react';
 import { ImageUpload } from '../components/ImageUpload';
+import NotificationModal from '../components/NotificationModal';
 
 const Admin: React.FC = () => {
   const [marcas, setMarcas] = useState<Marca[]>([]);
@@ -33,9 +34,25 @@ const Admin: React.FC = () => {
   const [editingMarca, setEditingMarca] = useState<string | null>(null);
   const [editingModelo, setEditingModelo] = useState<string | null>(null);
 
+  // Estado para notificações
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    type: 'success' as 'success' | 'error' | 'warning',
+    title: '',
+    message: ''
+  });
+
   useEffect(() => {
     loadData();
   }, []);
+
+  const showNotification = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+    setNotification({ isOpen: true, type, title, message });
+  };
+
+  const closeNotification = () => {
+    setNotification({ ...notification, isOpen: false });
+  };
 
   const loadData = async () => {
     try {
@@ -49,6 +66,7 @@ const Admin: React.FC = () => {
       setModelos(modelosData);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
+      showNotification('error', 'Erro ao Carregar Dados', 'Ocorreu um erro ao carregar os dados do sistema.');
     } finally {
       setLoading(false);
     }
@@ -100,10 +118,10 @@ const Admin: React.FC = () => {
       // Recarregar dados
       await loadData();
       
-      alert('✅ Carro cadastrado com sucesso!');
+      showNotification('success', 'Sucesso!', 'Carro cadastrado com sucesso!');
     } catch (error) {
       console.error('Erro ao criar carro:', error);
-      alert('❌ Erro ao criar carro. Tente novamente.');
+      showNotification('error', 'Erro ao Criar Carro', 'Ocorreu um erro ao criar o carro. Tente novamente.');
     }
   };
 
@@ -116,20 +134,19 @@ const Admin: React.FC = () => {
         const marca = marcas.find(m => m.id === id);
         const listaModelos = modelosDaMarca.map(m => `• ${m.descricao} (${m.codigo})`).join('\n');
         
-        alert(`❌ Não é possível excluir a marca "${marca?.nome}"!\n\n` +
-              `📊 Existem ${modelosDaMarca.length} modelo(s) cadastrado(s) com esta marca:\n\n` +
-              `${listaModelos}\n\n` +
-              `🔧 Para excluir esta marca, primeiro exclua todos os modelos listados acima.`);
+        showNotification('warning', 'Não é Possível Excluir a Marca', 
+          `A marca "${marca?.nome}" não pode ser excluída pois existem ${modelosDaMarca.length} modelo(s) cadastrado(s) com esta marca:\n\n${listaModelos}\n\nPara excluir esta marca, primeiro exclua todos os modelos listados acima.`);
         return;
       }
 
       if (window.confirm('Tem certeza que deseja excluir esta marca?')) {
         await marcaService.delete(id);
         loadData();
+        showNotification('success', 'Sucesso!', 'Marca excluída com sucesso!');
       }
     } catch (error) {
       console.error('Erro ao excluir marca:', error);
-      alert('❌ Erro ao excluir marca. Tente novamente.');
+      showNotification('error', 'Erro ao Excluir Marca', 'Ocorreu um erro ao excluir a marca. Tente novamente.');
     }
   };
 
@@ -142,20 +159,19 @@ const Admin: React.FC = () => {
         const modelo = modelos.find(m => m.id === id);
         const listaCarros = carrosDoModelo.map(c => `• ${c.descricao} (${c.codigo})`).join('\n');
         
-        alert(`❌ Não é possível excluir o modelo "${modelo?.descricao}"!\n\n` +
-              `📊 Existem ${carrosDoModelo.length} carro(s) cadastrado(s) com este modelo:\n\n` +
-              `${listaCarros}\n\n` +
-              `🔧 Para excluir este modelo, primeiro exclua todos os carros listados acima.`);
+        showNotification('warning', 'Não é Possível Excluir o Modelo', 
+          `O modelo "${modelo?.descricao}" não pode ser excluído pois existem ${carrosDoModelo.length} carro(s) cadastrado(s) com este modelo:\n\n${listaCarros}\n\nPara excluir este modelo, primeiro exclua todos os carros listados acima.`);
         return;
       }
 
       if (window.confirm('Tem certeza que deseja excluir este modelo?')) {
         await modeloService.delete(id);
         loadData();
+        showNotification('success', 'Sucesso!', 'Modelo excluído com sucesso!');
       }
     } catch (error) {
       console.error('Erro ao excluir modelo:', error);
-      alert('❌ Erro ao excluir modelo. Tente novamente.');
+      showNotification('error', 'Erro ao Excluir Modelo', 'Ocorreu um erro ao excluir o modelo. Tente novamente.');
     }
   };
 
@@ -216,10 +232,10 @@ const Admin: React.FC = () => {
       // Recarregar dados
       await loadData();
       
-      alert('✅ Carro atualizado com sucesso!');
+      showNotification('success', 'Sucesso!', 'Carro atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar carro:', error);
-      alert('❌ Erro ao atualizar carro. Tente novamente.');
+      showNotification('error', 'Erro ao Atualizar Carro', 'Ocorreu um erro ao atualizar o carro. Tente novamente.');
     }
   };
 
@@ -228,9 +244,16 @@ const Admin: React.FC = () => {
       try {
         await carroService.delete(id);
         loadData();
-      } catch (error) {
+        showNotification('success', 'Sucesso!', 'Carro excluído com sucesso!');
+      } catch (error: any) {
         console.error('Erro ao excluir carro:', error);
-        alert('❌ Erro ao excluir carro. Tente novamente.');
+        
+        // Mostrar mensagem específica do erro
+        if (error.response?.data?.message) {
+          showNotification('error', 'Erro ao Excluir Carro', error.response.data.message);
+        } else {
+          showNotification('error', 'Erro ao Excluir Carro', 'Ocorreu um erro ao excluir o carro. Tente novamente.');
+        }
       }
     }
   };
@@ -254,10 +277,10 @@ const Admin: React.FC = () => {
       setEditingMarca(null);
       setMarcaForm({ nome: '' });
       await loadData();
-      alert('✅ Marca atualizada com sucesso!');
+      showNotification('success', 'Sucesso!', 'Marca atualizada com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar marca:', error);
-      alert('❌ Erro ao atualizar marca. Tente novamente.');
+      showNotification('error', 'Erro ao Atualizar Marca', 'Ocorreu um erro ao atualizar a marca. Tente novamente.');
     }
   };
 
@@ -284,10 +307,10 @@ const Admin: React.FC = () => {
       setEditingModelo(null);
       setModeloForm({ codigo: '', descricao: '', marcaId: '' });
       await loadData();
-      alert('✅ Modelo atualizado com sucesso!');
+      showNotification('success', 'Sucesso!', 'Modelo atualizado com sucesso!');
     } catch (error) {
       console.error('Erro ao atualizar modelo:', error);
-      alert('❌ Erro ao atualizar modelo. Tente novamente.');
+      showNotification('error', 'Erro ao Atualizar Modelo', 'Ocorreu um erro ao atualizar o modelo. Tente novamente.');
     }
   };
 
@@ -771,6 +794,15 @@ const Admin: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Notificação */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

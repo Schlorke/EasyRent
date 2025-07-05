@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import { imageService } from '../services/imageService.js';
+import { imageService } from '../services/imageService';
 import { PrismaClient } from '@prisma/client';
 
 const router = Router();
@@ -12,7 +12,7 @@ const storage = multer.memoryStorage();
 const upload = multer({
   storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 50 * 1024 * 1024 // 50MB
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];

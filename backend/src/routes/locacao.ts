@@ -113,39 +113,8 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
       return;
     }
 
-    // Verificar se o carro está disponível no período
-    const conflitos = await prisma.locacao.findMany({
-      where: {
-        carroId,
-        OR: [
-          {
-            AND: [
-              { dataRetirada: { lte: dataRetiradaDate } },
-              { dataDevolucao: { gte: dataRetiradaDate } }
-            ]
-          },
-          {
-            AND: [
-              { dataRetirada: { lte: dataDevolucaoDate } },
-              { dataDevolucao: { gte: dataDevolucaoDate } }
-            ]
-          },
-          {
-            AND: [
-              { dataRetirada: { gte: dataRetiradaDate } },
-              { dataDevolucao: { lte: dataDevolucaoDate } }
-            ]
-          }
-        ]
-      }
-    });
-
-    if (conflitos.length > 0) {
-      res.status(400).json({ 
-        message: 'Carro não está disponível no período selecionado' 
-      });
-      return;
-    }
+    // Verificação de conflito removida para fins acadêmicos
+    // Permite múltiplas locações do mesmo carro na mesma data
 
     // Calcular valor baseado no valor do carro
     const dias = Math.ceil((dataDevolucaoDate.getTime() - dataRetiradaDate.getTime()) / (1000 * 60 * 60 * 24));

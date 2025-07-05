@@ -6,6 +6,7 @@ import { carroService, locacaoService } from '../services/api';
 import type { Carro } from '../types';
 import { Search, Car, Calendar, MapPin, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import NotificationModal from '../components/NotificationModal';
 
 const Locacao: React.FC = () => {
   const navigate = useNavigate();
@@ -21,6 +22,12 @@ const Locacao: React.FC = () => {
     observacoes: ''
   });
   const [locacaoLoading, setLocacaoLoading] = useState(false);
+  const [notification, setNotification] = useState({
+    isOpen: false,
+    type: 'success' as 'success' | 'error' | 'warning',
+    title: '',
+    message: ''
+  });
   
   const isAuthenticated = localStorage.getItem('token');
 
@@ -51,10 +58,24 @@ const Locacao: React.FC = () => {
     return carro.valor || 150; // Fallback para 150 se não tiver valor
   };
 
+  const showNotification = (type: 'success' | 'error' | 'warning', title: string, message: string) => {
+    setNotification({ isOpen: true, type, title, message });
+  };
+
+  const closeNotification = () => {
+    setNotification({ ...notification, isOpen: false });
+  };
+
   const handleAlugar = (carro: Carro) => {
     if (!isAuthenticated) {
-      alert('Você precisa estar logado para alugar um veículo!');
-      navigate('/login');
+      showNotification(
+        'warning',
+        'Login Necessário',
+        'Você precisa estar logado para alugar um veículo!'
+      );
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
       return;
     }
     
@@ -86,7 +107,11 @@ const Locacao: React.FC = () => {
         observacoes: locacaoForm.observacoes
       });
       
-      alert('🎉 Locação realizada com sucesso!\n\nVocê receberá um e-mail com os detalhes da locação.');
+      showNotification(
+        'success',
+        'Locação Realizada com Sucesso!',
+        'Parabéns! Sua locação foi confirmada.\n\nVocê receberá um e-mail com todos os detalhes da locação em breve.'
+      );
       setShowModal(false);
       setSelectedCarro(null);
       setLocacaoForm({
@@ -96,7 +121,11 @@ const Locacao: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Erro ao criar locação:', error);
-      alert('❌ Erro ao realizar locação: ' + (error.response?.data?.message || 'Tente novamente.'));
+      showNotification(
+        'error',
+        'Erro ao Realizar Locação',
+        'Ops! Ocorreu um erro ao processar sua locação.\n\n' + (error.response?.data?.message || 'Tente novamente em alguns instantes.')
+      );
     } finally {
       setLocacaoLoading(false);
     }
@@ -186,7 +215,17 @@ const Locacao: React.FC = () => {
             <Card key={carro.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-w-16 aspect-h-9 bg-gray-200">
                 <img
-                  src={carro.imagem || '/car-icon.svg'}
+                  src={
+                    carro.imagem 
+                      ? (carro.imagem.startsWith('upload:') 
+                          ? `/uploads/carros/${carro.imagem.substring(7)}`
+                          : carro.imagem.startsWith('data:') 
+                            ? carro.imagem
+                            : carro.imagem.startsWith('/assets/') 
+                              ? carro.imagem
+                              : `/images/carros/${carro.imagem}`)
+                      : '/car-icon.svg'
+                  }
                   alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
                   className="w-full h-48 object-cover"
                   onError={(e) => {
@@ -273,7 +312,11 @@ const Locacao: React.FC = () => {
                         selectedCarro.imagem 
                           ? (selectedCarro.imagem.startsWith('upload:') 
                               ? `/uploads/carros/${selectedCarro.imagem.substring(7)}`
-                              : `/images/carros/${selectedCarro.imagem}`)
+                              : selectedCarro.imagem.startsWith('data:') 
+                                ? selectedCarro.imagem
+                                : selectedCarro.imagem.startsWith('/assets/') 
+                                  ? selectedCarro.imagem
+                                  : `/images/carros/${selectedCarro.imagem}`)
                           : '/images/car-placeholder.svg'
                       }
                       alt={`${selectedCarro.modelo?.marca?.nome} ${selectedCarro.modelo?.descricao}`}
@@ -372,6 +415,15 @@ const Locacao: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Notificação */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={closeNotification}
+      />
     </div>
   );
 };

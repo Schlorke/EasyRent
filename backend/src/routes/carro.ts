@@ -41,34 +41,8 @@ router.get('/disponiveis', async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    // Buscar carros que não têm locações conflitantes
+    // Buscar todos os carros (sem filtro de disponibilidade para fins acadêmicos)
     const carros = await prisma.carro.findMany({
-      where: {
-        locacoes: {
-          none: {
-            OR: [
-              {
-                AND: [
-                  { dataRetirada: { lte: new Date(dataInicio as string) } },
-                  { dataDevolucao: { gte: new Date(dataInicio as string) } }
-                ]
-              },
-              {
-                AND: [
-                  { dataRetirada: { lte: new Date(dataFim as string) } },
-                  { dataDevolucao: { gte: new Date(dataFim as string) } }
-                ]
-              },
-              {
-                AND: [
-                  { dataRetirada: { gte: new Date(dataInicio as string) } },
-                  { dataDevolucao: { lte: new Date(dataFim as string) } }
-                ]
-              }
-            ]
-          }
-        }
-      },
       include: {
         modelo: {
           include: {
@@ -343,6 +317,8 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response): Pr
   try {
     const { id } = req.params;
 
+    console.log('🗑️ Tentando deletar carro com ID:', id);
+
     // Verificar se o carro existe e se tem locações associadas
     const carro = await prisma.carro.findUnique({
       where: { id },
@@ -352,26 +328,38 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response): Pr
     });
 
     if (!carro) {
+      console.log('❌ Carro não encontrado:', id);
       res.status(404).json({ message: 'Carro não encontrado' });
       return;
     }
 
+    console.log('✅ Carro encontrado:', carro.codigo);
+    console.log('📊 Número de locações associadas:', carro.locacoes.length);
+
     // Verificar se existem locações associadas
     if (carro.locacoes.length > 0) {
+      console.log('❌ Carro possui locações associadas, não pode ser excluído');
       res.status(400).json({ 
-        message: 'Não é possível excluir o carro pois existem locações associadas' 
+        message: 'Não é possível excluir o carro pois existem locações associadas',
+        locacoes: carro.locacoes.length
       });
       return;
     }
 
+    console.log('✅ Carro pode ser excluído, procedendo...');
+    
     await prisma.carro.delete({
       where: { id }
     });
 
+    console.log('✅ Carro excluído com sucesso');
     res.status(204).send();
   } catch (error) {
-    console.error('Erro ao deletar carro:', error);
-    res.status(500).json({ message: 'Erro interno do servidor' });
+    console.error('❌ Erro ao deletar carro:', error);
+    res.status(500).json({ 
+      message: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    });
   }
 });
 
