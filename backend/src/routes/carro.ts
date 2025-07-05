@@ -131,11 +131,11 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 // Criar novo carro
 router.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
+    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem, valor } = req.body;
 
-    if (!codigo || !modeloId || !ano || !cor || !descricao) {
+    if (!codigo || !modeloId || !ano || !cor || !descricao || !valor) {
       res.status(400).json({ 
-        message: 'Código, modelo, ano, cor e descrição são obrigatórios' 
+        message: 'Código, modelo, ano, cor, descrição e valor são obrigatórios' 
       });
       return;
     }
@@ -178,7 +178,8 @@ router.post('/', authenticateToken, async (req: Request, res: Response): Promise
         cor,
         descricao,
         observacoes,
-        imagem
+        imagem,
+        valor: parseFloat(valor)
       },
       include: {
         modelo: {
@@ -200,11 +201,11 @@ router.post('/', authenticateToken, async (req: Request, res: Response): Promise
 router.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
+    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem, valor } = req.body;
 
-    if (!codigo || !modeloId || !ano || !cor || !descricao) {
+    if (!codigo || !modeloId || !ano || !cor || !descricao || !valor) {
       res.status(400).json({ 
-        message: 'Código, modelo, ano, cor e descrição são obrigatórios' 
+        message: 'Código, modelo, ano, cor, descrição e valor são obrigatórios' 
       });
       return;
     }
@@ -261,7 +262,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response): Promi
         cor,
         descricao,
         observacoes,
-        imagem
+        imagem,
+        valor: parseFloat(valor)
       },
       include: {
         modelo: {

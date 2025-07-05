@@ -131,6 +131,33 @@ export const carroService = {
   },
 };
 
+// Serviços de locação
+export const locacaoService = {
+  async getAll(): Promise<any[]> {
+    const response = await api.get('/locacoes');
+    return response.data;
+  },
+
+  async getMinhas(): Promise<any[]> {
+    const response = await api.get('/locacoes/minhas');
+    return response.data;
+  },
+
+  async create(locacao: {
+    carroId: string;
+    dataRetirada: string;
+    dataDevolucao: string;
+    observacoes?: string;
+  }): Promise<any> {
+    const response = await api.post('/locacoes', locacao);
+    return response.data;
+  },
+
+  async cancel(id: string): Promise<void> {
+    await api.delete(`/locacoes/${id}`);
+  },
+};
+
 // Serviços de upload
 export const uploadService = {
   async uploadCarImage(file: File): Promise<{ filename: string; path: string }> {

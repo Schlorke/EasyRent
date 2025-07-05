@@ -62,7 +62,13 @@ const Cadastro: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <Car className="h-12 w-12 text-blue-600" />
+            <div className="bg-white rounded-full p-4 shadow-lg">
+              <img
+                src="/assets/easyrent-logo.png"
+                alt="EasyRent Logo"
+                className="h-16 w-16 object-contain"
+              />
+            </div>
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
             Crie sua conta

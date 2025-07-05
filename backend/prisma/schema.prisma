@@ -60,6 +60,7 @@ model Carro {
   descricao   String
   observacoes String?
   imagem      String?
+  valor       Float  @default(150.0) // Valor da diária em reais
   modelo      Modelo @relation(fields: [modeloId], references: [id], onDelete: Cascade)
   locacoes    Locacao[]
   

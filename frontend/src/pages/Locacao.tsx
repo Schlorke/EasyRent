@@ -2,15 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { carroService } from '../services/api';
+import { carroService, locacaoService } from '../services/api';
 import type { Carro } from '../types';
-import { Search, Car, Calendar, MapPin } from 'lucide-react';
+import { Search, Car, Calendar, MapPin, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Locacao: React.FC = () => {
+  const navigate = useNavigate();
   const [carros, setCarros] = useState<Carro[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCarro, setSelectedCarro] = useState<Carro | null>(null);
+  const [locacaoForm, setLocacaoForm] = useState({
+    dataRetirada: '',
+    dataDevolucao: '',
+    observacoes: ''
+  });
+  const [locacaoLoading, setLocacaoLoading] = useState(false);
+  
+  const isAuthenticated = localStorage.getItem('token');
 
   useEffect(() => {
     loadCarros();
@@ -34,19 +46,88 @@ const Locacao: React.FC = () => {
     carro.cor.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Mock de preços (seria vindo do backend)
-  const getPrecoMock = (carroId: string) => {
-    const precos = {
-      '1': 150,
-      '2': 160,
-      '3': 140,
-      '4': 300,
-      '5': 200,
-      '6': 180,
-      '7': 250,
-      '8': 190,
-    };
-    return precos[carroId as keyof typeof precos] || 180;
+  // Função para obter o preço do carro
+  const getPreco = (carro: Carro) => {
+    return carro.valor || 150; // Fallback para 150 se não tiver valor
+  };
+
+  const handleAlugar = (carro: Carro) => {
+    if (!isAuthenticated) {
+      alert('Você precisa estar logado para alugar um veículo!');
+      navigate('/login');
+      return;
+    }
+    
+    setSelectedCarro(carro);
+    setShowModal(true);
+    
+    // Definir data mínima como amanhã
+    const amanha = new Date();
+    amanha.setDate(amanha.getDate() + 1);
+    const dataMinima = amanha.toISOString().split('T')[0];
+    
+    setLocacaoForm({
+      dataRetirada: dataMinima,
+      dataDevolucao: '',
+      observacoes: ''
+    });
+  };
+
+  const handleConfirmarLocacao = async () => {
+    if (!selectedCarro) return;
+    
+    setLocacaoLoading(true);
+    
+    try {
+      await locacaoService.create({
+        carroId: selectedCarro.id,
+        dataRetirada: locacaoForm.dataRetirada,
+        dataDevolucao: locacaoForm.dataDevolucao,
+        observacoes: locacaoForm.observacoes
+      });
+      
+      alert('🎉 Locação realizada com sucesso!\n\nVocê receberá um e-mail com os detalhes da locação.');
+      setShowModal(false);
+      setSelectedCarro(null);
+      setLocacaoForm({
+        dataRetirada: '',
+        dataDevolucao: '',
+        observacoes: ''
+      });
+    } catch (error: any) {
+      console.error('Erro ao criar locação:', error);
+      alert('❌ Erro ao realizar locação: ' + (error.response?.data?.message || 'Tente novamente.'));
+    } finally {
+      setLocacaoLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedCarro(null);
+    setLocacaoForm({
+      dataRetirada: '',
+      dataDevolucao: '',
+      observacoes: ''
+    });
+  };
+
+  const calcularDias = () => {
+    if (!locacaoForm.dataRetirada || !locacaoForm.dataDevolucao) return 0;
+    
+    const dataRetirada = new Date(locacaoForm.dataRetirada);
+    const dataDevolucao = new Date(locacaoForm.dataDevolucao);
+    
+    const diffTime = dataDevolucao.getTime() - dataRetirada.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays > 0 ? diffDays : 0;
+  };
+
+  const calcularTotal = () => {
+    if (!selectedCarro) return 0;
+    const dias = calcularDias();
+    return dias * getPreco(selectedCarro);
   };
 
   if (loading) {
@@ -141,11 +222,11 @@ const Locacao: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-2xl font-bold text-green-600">
-                        R$ {getPrecoMock(carro.id)}
+                        R$ {getPreco(carro).toFixed(2)}
                       </span>
                       <span className="text-sm text-gray-500">/dia</span>
                     </div>
-                    <Button size="sm">
+                    <Button size="sm" onClick={() => handleAlugar(carro)}>
                       Alugar
                     </Button>
                   </div>
@@ -164,6 +245,126 @@ const Locacao: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Modal de Locação */}
+      {showModal && selectedCarro && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Alugar Veículo
+                </h2>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Informações do Carro */}
+              <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-16 h-12 bg-gray-200 rounded-md overflow-hidden">
+                    <img
+                      src={selectedCarro.imagem ? `/images/carros/${selectedCarro.imagem}` : '/images/car-placeholder.svg'}
+                      alt={`${selectedCarro.modelo?.marca?.nome} ${selectedCarro.modelo?.descricao}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/car-placeholder.svg';
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-lg">
+                      {selectedCarro.modelo?.marca?.nome} {selectedCarro.modelo?.descricao}
+                    </h3>
+                    <p className="text-gray-600">
+                      {selectedCarro.ano} - {selectedCarro.cor}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formulário de Locação */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Data de Retirada
+                  </label>
+                  <Input
+                    type="date"
+                    value={locacaoForm.dataRetirada}
+                    onChange={(e) => setLocacaoForm({ ...locacaoForm, dataRetirada: e.target.value })}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Data de Devolução
+                  </label>
+                  <Input
+                    type="date"
+                    value={locacaoForm.dataDevolucao}
+                    onChange={(e) => setLocacaoForm({ ...locacaoForm, dataDevolucao: e.target.value })}
+                    min={locacaoForm.dataRetirada || new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Observações (opcional)
+                  </label>
+                  <textarea
+                    value={locacaoForm.observacoes}
+                    onChange={(e) => setLocacaoForm({ ...locacaoForm, observacoes: e.target.value })}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    rows={3}
+                    placeholder="Observações sobre a locação..."
+                  />
+                </div>
+
+                {/* Resumo do Valor */}
+                {calcularDias() > 0 && (
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                                         <div className="flex justify-between items-center">
+                       <span className="text-sm text-gray-600">
+                         {calcularDias()} dia(s) × R$ {getPreco(selectedCarro).toFixed(2)}
+                       </span>
+                       <span className="text-lg font-bold text-blue-600">
+                         R$ {calcularTotal().toFixed(2)}
+                       </span>
+                     </div>
+                  </div>
+                )}
+
+                {/* Botões */}
+                <div className="flex space-x-4 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={handleCloseModal}
+                    className="flex-1"
+                    disabled={locacaoLoading}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={handleConfirmarLocacao}
+                    className="flex-1"
+                    disabled={locacaoLoading || !locacaoForm.dataRetirada || !locacaoForm.dataDevolucao || calcularDias() <= 0}
+                  >
+                    {locacaoLoading ? 'Processando...' : 'Confirmar Locação'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

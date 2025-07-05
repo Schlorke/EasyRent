@@ -127,10 +127,10 @@ router.get('/:id', async (req, res) => {
 // Criar novo carro
 router.post('/', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
-        if (!codigo || !modeloId || !ano || !cor || !descricao) {
+        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem, valor } = req.body;
+        if (!codigo || !modeloId || !ano || !cor || !descricao || !valor) {
             res.status(400).json({
-                message: 'Código, modelo, ano, cor e descrição são obrigatórios'
+                message: 'Código, modelo, ano, cor, descrição e valor são obrigatórios'
             });
             return;
         }
@@ -167,7 +167,8 @@ router.post('/', auth_1.authenticateToken, async (req, res) => {
                 cor,
                 descricao,
                 observacoes,
-                imagem
+                imagem,
+                valor: parseFloat(valor)
             },
             include: {
                 modelo: {
@@ -188,10 +189,10 @@ router.post('/', auth_1.authenticateToken, async (req, res) => {
 router.put('/:id', auth_1.authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
-        if (!codigo || !modeloId || !ano || !cor || !descricao) {
+        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem, valor } = req.body;
+        if (!codigo || !modeloId || !ano || !cor || !descricao || !valor) {
             res.status(400).json({
-                message: 'Código, modelo, ano, cor e descrição são obrigatórios'
+                message: 'Código, modelo, ano, cor, descrição e valor são obrigatórios'
             });
             return;
         }
@@ -240,7 +241,8 @@ router.put('/:id', auth_1.authenticateToken, async (req, res) => {
                 cor,
                 descricao,
                 observacoes,
-                imagem
+                imagem,
+                valor: parseFloat(valor)
             },
             include: {
                 modelo: {

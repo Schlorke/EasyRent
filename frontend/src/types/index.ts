@@ -29,6 +29,7 @@ export interface Carro {
   descricao: string;
   observacoes?: string;
   imagem?: string;
+  valor: number;
   modelo?: Modelo;
   locacoes?: Locacao[];
 }

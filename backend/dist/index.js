@@ -16,6 +16,7 @@ const modelo_1 = __importDefault(require("./routes/modelo"));
 const carro_1 = __importDefault(require("./routes/carro"));
 const auth_1 = __importDefault(require("./routes/auth"));
 const upload_1 = __importDefault(require("./routes/upload"));
+const locacao_1 = __importDefault(require("./routes/locacao"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const prisma = new client_1.PrismaClient();
@@ -40,6 +41,7 @@ app.use('/marcas', marca_1.default);
 app.use('/modelos', modelo_1.default);
 app.use('/carros', carro_1.default);
 app.use('/upload', upload_1.default);
+app.use('/locacoes', locacao_1.default);
 // Rota de healthcheck
 app.get('/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });

@@ -1,12 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/Button';
-import { Car, User, LogOut } from 'lucide-react';
+import { Car, User, LogOut, Settings } from 'lucide-react';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const isAuthenticated = localStorage.getItem('token');
-  const isAdmin = localStorage.getItem('userRole') === 'admin';
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -20,8 +19,12 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-20">
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-3 group">
-              <div className="bg-blue-600 rounded-lg p-2 group-hover:bg-blue-700 transition-colors">
-                <Car className="h-8 w-8 text-white" />
+              <div className="relative overflow-hidden rounded-lg group-hover:scale-105 transition-transform duration-300">
+                <img
+                  src="/assets/easyrent-logo.png"
+                  alt="EasyRent Logo"
+                  className="h-12 w-12 object-contain"
+                />
               </div>
               <span className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
                 EasyRent
@@ -45,14 +48,16 @@ const Header: React.FC = () => {
             
             {isAuthenticated ? (
               <>
-                {isAdmin && (
-                  <Link 
-                    to="/admin" 
-                    className="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-blue-50 transition-all duration-200"
-                  >
-                    Admin
-                  </Link>
-                )}
+                {/* Botão especial para Admin - apenas para usuários logados */}
+                <Link 
+                  to="/admin" 
+                  className="bg-orange-500 hover:bg-orange-600 text-black font-bold px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center space-x-2 animate-pulse hover:animate-none"
+                  title="Acesso liberado para fins acadêmicos"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="text-sm">Acesso à Área Admin Para Fins Acadêmicos</span>
+                </Link>
+                
                 <Button
                   variant="outline"
                   onClick={handleLogout}

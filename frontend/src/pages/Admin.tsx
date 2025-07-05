@@ -24,7 +24,8 @@ const Admin: React.FC = () => {
     cor: '',
     descricao: '',
     observacoes: '',
-    imagem: ''
+    imagem: '',
+    valor: ''
   });
 
   // Estados para edição
@@ -78,7 +79,8 @@ const Admin: React.FC = () => {
     try {
       await carroService.create({
         ...carroForm,
-        ano: parseInt(carroForm.ano)
+        ano: parseInt(carroForm.ano),
+        valor: parseFloat(carroForm.valor)
       });
       
       // Limpar formulário
@@ -89,7 +91,8 @@ const Admin: React.FC = () => {
         cor: '',
         descricao: '',
         observacoes: '',
-        imagem: ''
+        imagem: '',
+        valor: ''
       });
       
       // Recarregar dados
@@ -163,7 +166,8 @@ const Admin: React.FC = () => {
       cor: carro.cor,
       descricao: carro.descricao,
       observacoes: carro.observacoes || '',
-      imagem: carro.imagem || ''
+      imagem: carro.imagem || '',
+      valor: carro.valor.toString()
     });
   };
 
@@ -176,7 +180,8 @@ const Admin: React.FC = () => {
       cor: '',
       descricao: '',
       observacoes: '',
-      imagem: ''
+      imagem: '',
+      valor: ''
     });
   };
 
@@ -187,7 +192,8 @@ const Admin: React.FC = () => {
     try {
       await carroService.update(editingCarro, {
         ...carroForm,
-        ano: parseInt(carroForm.ano)
+        ano: parseInt(carroForm.ano),
+        valor: parseFloat(carroForm.valor)
       });
       
       // Limpar estado de edição primeiro
@@ -201,7 +207,8 @@ const Admin: React.FC = () => {
         cor: '',
         descricao: '',
         observacoes: '',
-        imagem: ''
+        imagem: '',
+        valor: ''
       });
       
       // Recarregar dados
@@ -510,6 +517,20 @@ const Admin: React.FC = () => {
                       required
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Valor da Diária (R$)
+                    </label>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      placeholder="Digite o valor da diária"
+                      value={carroForm.valor}
+                      onChange={(e) => setCarroForm({ ...carroForm, valor: e.target.value })}
+                      required
+                    />
+                  </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Descrição
@@ -617,6 +638,9 @@ const Admin: React.FC = () => {
                           <p className="text-sm text-gray-600 truncate">{carro.descricao}</p>
                           <p className="text-sm text-gray-600">
                             {carro.ano} - {carro.cor}
+                          </p>
+                          <p className="text-sm font-semibold text-green-600">
+                            R$ {carro.valor?.toFixed(2) || '150,00'}/dia
                           </p>
                         </div>
                       </div>

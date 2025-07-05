@@ -21,7 +21,7 @@ const Login: React.FC = () => {
     try {
       const response = await userService.login({ email, senha });
       localStorage.setItem('token', response.token);
-      localStorage.setItem('userRole', 'user'); // Por enquanto, todos são usuários
+      localStorage.setItem('userRole', 'admin'); // Para fins acadêmicos, todos têm acesso total
       navigate('/');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao fazer login');
@@ -35,8 +35,12 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="flex justify-center">
-            <div className="bg-blue-600 rounded-full p-4 shadow-lg">
-              <Car className="h-12 w-12 text-white" />
+            <div className="bg-white rounded-full p-4 shadow-lg">
+              <img
+                src="/assets/easyrent-logo.png"
+                alt="EasyRent Logo"
+                className="h-16 w-16 object-contain"
+              />
             </div>
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
