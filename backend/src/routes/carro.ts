@@ -131,7 +131,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 // Criar novo carro
 router.post('/', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
-    const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
+    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
 
     if (!codigo || !modeloId || !ano || !cor || !descricao) {
       res.status(400).json({ 
@@ -177,7 +177,8 @@ router.post('/', authenticateToken, async (req: Request, res: Response): Promise
         ano: parseInt(ano),
         cor,
         descricao,
-        observacoes
+        observacoes,
+        imagem
       },
       include: {
         modelo: {
@@ -199,7 +200,7 @@ router.post('/', authenticateToken, async (req: Request, res: Response): Promise
 router.put('/:id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
+    const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
 
     if (!codigo || !modeloId || !ano || !cor || !descricao) {
       res.status(400).json({ 
@@ -259,7 +260,8 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response): Promi
         ano: parseInt(ano),
         cor,
         descricao,
-        observacoes
+        observacoes,
+        imagem
       },
       include: {
         modelo: {

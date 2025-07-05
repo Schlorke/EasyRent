@@ -59,6 +59,7 @@ model Carro {
   cor         String
   descricao   String
   observacoes String?
+  imagem      String?
   modelo      Modelo @relation(fields: [modeloId], references: [id], onDelete: Cascade)
   locacoes    Locacao[]
   

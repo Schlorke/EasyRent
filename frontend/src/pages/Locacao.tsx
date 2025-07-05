@@ -105,11 +105,11 @@ const Locacao: React.FC = () => {
             <Card key={carro.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-w-16 aspect-h-9 bg-gray-200">
                 <img
-                  src={`/assets/img/car-placeholder.jpg`}
+                  src={carro.imagem ? `/images/carros/${carro.imagem}` : '/images/car-placeholder.svg'}
                   alt={`${carro.modelo?.marca?.nome} ${carro.modelo?.descricao}`}
                   className="w-full h-48 object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Carro';
+                    (e.target as HTMLImageElement).src = '/images/car-placeholder.svg';
                   }}
                 />
               </div>

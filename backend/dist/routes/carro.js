@@ -127,7 +127,7 @@ router.get('/:id', async (req, res) => {
 // Criar novo carro
 router.post('/', auth_1.authenticateToken, async (req, res) => {
     try {
-        const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
+        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
         if (!codigo || !modeloId || !ano || !cor || !descricao) {
             res.status(400).json({
                 message: 'Código, modelo, ano, cor e descrição são obrigatórios'
@@ -166,7 +166,8 @@ router.post('/', auth_1.authenticateToken, async (req, res) => {
                 ano: parseInt(ano),
                 cor,
                 descricao,
-                observacoes
+                observacoes,
+                imagem
             },
             include: {
                 modelo: {
@@ -187,7 +188,7 @@ router.post('/', auth_1.authenticateToken, async (req, res) => {
 router.put('/:id', auth_1.authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
-        const { codigo, modeloId, ano, cor, descricao, observacoes } = req.body;
+        const { codigo, modeloId, ano, cor, descricao, observacoes, imagem } = req.body;
         if (!codigo || !modeloId || !ano || !cor || !descricao) {
             res.status(400).json({
                 message: 'Código, modelo, ano, cor e descrição são obrigatórios'
@@ -238,7 +239,8 @@ router.put('/:id', auth_1.authenticateToken, async (req, res) => {
                 ano: parseInt(ano),
                 cor,
                 descricao,
-                observacoes
+                observacoes,
+                imagem
             },
             include: {
                 modelo: {

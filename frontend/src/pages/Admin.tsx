@@ -22,7 +22,8 @@ const Admin: React.FC = () => {
     ano: '',
     cor: '',
     descricao: '',
-    observacoes: ''
+    observacoes: '',
+    imagem: ''
   });
 
   useEffect(() => {
@@ -81,7 +82,8 @@ const Admin: React.FC = () => {
         ano: '',
         cor: '',
         descricao: '',
-        observacoes: ''
+        observacoes: '',
+        imagem: ''
       });
       loadData();
     } catch (error) {
@@ -402,6 +404,20 @@ const Admin: React.FC = () => {
                       onChange={(e) => setCarroForm({ ...carroForm, descricao: e.target.value })}
                       required
                     />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Imagem do Veículo
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="Digite o nome da imagem (ex: civic.jpg)"
+                      value={carroForm.imagem}
+                      onChange={(e) => setCarroForm({ ...carroForm, imagem: e.target.value })}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Coloque a imagem na pasta /public/images/carros/ e digite apenas o nome do arquivo
+                    </p>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
