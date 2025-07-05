@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Usuario, Marca, Modelo, Carro, LoginRequest, LoginResponse } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://easyrent-production-1dc9.up.railway.app/';
 
 const api = axios.create({
   baseURL: API_URL,
