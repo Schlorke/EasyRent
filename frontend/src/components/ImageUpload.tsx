@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Button } from './ui/Button';
 import { uploadService } from '../services/api';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Image as ImageIcon, FolderOpen } from 'lucide-react';
+import ImageSelector from './ImageSelector';
 
 interface ImageUploadProps {
   currentImage?: string;
@@ -16,6 +17,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [showSelector, setShowSelector] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,6 +70,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     onImageChange('');
   };
 
+  const handleSelectExisting = (filename: string) => {
+    setPreview(null); // Limpar preview para mostrar a imagem selecionada
+    onImageChange(filename);
+  };
+
   // Limpar preview quando a imagem atual mudar (para casos de reset do formulário)
   React.useEffect(() => {
     if (!currentImage) {
@@ -105,38 +112,59 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
       )}
 
       {/* Botões de ação */}
-      <div className="flex space-x-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading || disabled}
-          className="flex-1"
-        >
-          {uploading ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
-              Enviando...
-            </>
-          ) : (
-            <>
-              <Upload className="h-4 w-4 mr-2" />
-              {getCurrentImageSrc() ? 'Alterar Imagem' : 'Enviar Imagem'}
-            </>
-          )}
-        </Button>
-
-        {getCurrentImageSrc() && (
+      <div className="space-y-3">
+        {/* Botões principais */}
+        <div className="flex space-x-2">
           <Button
             type="button"
             variant="outline"
-            onClick={handleRemoveImage}
-            disabled={disabled}
-            className="px-3"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading || disabled}
+            className="flex-1"
           >
-            <X className="h-4 w-4" />
+            {uploading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                {getCurrentImageSrc() ? 'Alterar Imagem' : 'Enviar Nova'}
+              </>
+            )}
           </Button>
-        )}
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowSelector(true)}
+            disabled={uploading || disabled}
+            className="flex-1"
+          >
+            <FolderOpen className="h-4 w-4 mr-2" />
+            Escolher Existente
+          </Button>
+
+          {getCurrentImageSrc() && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleRemoveImage}
+              disabled={disabled}
+              className="px-3"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        {/* Texto explicativo */}
+        <div className="text-center">
+          <p className="text-xs text-gray-500">
+            📤 Envie uma nova imagem ou 📁 escolha uma já existente
+          </p>
+        </div>
       </div>
 
       {/* Input de arquivo (oculto) */}
@@ -155,6 +183,14 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         <p>📏 Tamanho máximo: 5MB</p>
         <p>🖼️ Recomendado: 800x600px ou superior</p>
       </div>
+
+      {/* Modal de seleção de imagens */}
+      <ImageSelector
+        isOpen={showSelector}
+        onClose={() => setShowSelector(false)}
+        onSelect={handleSelectExisting}
+        currentImage={currentImage}
+      />
     </div>
   );
 };
